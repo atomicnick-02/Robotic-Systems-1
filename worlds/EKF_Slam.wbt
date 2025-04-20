@@ -3,13 +3,12 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/adept/pioneer2/protos/Pioneer2.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.09004021935834541 0.07213137235761098 0.9933226182966483 1.797332875703161
-  position 2.8490239710340735 -8.730832624211011 1.5142657146176002
+  orientation 0.1684172002760585 0.9744904264385864 -0.14833763996611213 1.175327549327373
+  position -4.579706473046831 -0.0715195507924038 7.502418226739905
 }
 TexturedBackground {
 }
@@ -18,6 +17,712 @@ TexturedBackgroundLight {
 RectangleArena {
   floorSize 5 5
 }
-Pioneer2 {
+Robot {
+  translation 0.05 0 0
+  children [
+    Camera {
+      translation 0.11 0 0.29
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              emissiveColor 1 0.5 0.5
+            }
+          }
+          geometry Box {
+            size 0.1 0.1 0.1
+          }
+        }
+      ]
+      boundingObject Box {
+        size 0.1 0.1 0.1
+      }
+      recognitionColors [
+        0 0 0
+      ]
+      near 0.1
+      far 5
+      lens Lens {
+      }
+      recognition Recognition {
+      }
+    }
+    Group {
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.3
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -0.215 0.1 0.059
+            -0.215 -0.1 0.059
+            -0.185 -0.135 0.059
+            0.095 -0.135 0.059
+            0.11 -0.08 0.059
+            0.11 0.08 0.059
+            0.095 0.135 0.059
+            -0.185 0.135 0.059
+            -0.215 0.1 0.059
+            -0.215 0.1 0.234
+            -0.215 -0.1 0.234
+            -0.185 -0.135 0.234
+            0.095 -0.135 0.234
+            0.11 -0.08 0.234
+            0.11 0.08 0.234
+            0.095 0.135 0.234
+            -0.185 0.135 0.234
+            -0.215 0.1 0.234
+          ]
+        }
+        coordIndex [
+          8, 7, 6, 5, 4, 3, 2, 1, 0, -1, 9, 10, 11, 12, 13, 14, 15, 16, 17, -1, 0, 1, 10, 9, -1, 1, 2, 11, 10, -1, 2, 3, 12, 11, -1, 3, 4, 13, 12, -1, 4, 5, 14, 13, -1, 5, 6, 15, 14, -1, 6, 7, 16, 15, -1, 7, 8, 17, 16, -1
+        ]
+      }
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.636415 0.655556 0.655556
+        roughness 0.3
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            0.174 0 0.234, 0.166 0.056 0.234, 0.145 0.107 0.234, 0.112 0.155 0.234, 0.064 0.19 0.234, -0.074 0.19 0.234, -0.096 0.16 0.234, -0.151 0.16 0.234, -0.2 0.155 0.234, -0.236 0.107 0.234, -0.256 0.056 0.234, -0.264 0 0.234, -0.256 -0.056 0.234, -0.236 -0.107 0.234, -0.2 -0.155 0.234, -0.151 -0.16 0.234, -0.096 -0.16 0.234, -0.074 -0.19 0.234, 0.064 -0.19 0.234, 0.112 -0.155 0.234, 0.145 -0.107 0.234, 0.166 -0.056 0.234, 0.174 0 0.234, 0.174 0 0.245, 0.166 0.056 0.245, 0.145 0.107 0.245, 0.112 0.155 0.245, 0.064 0.19 0.245, -0.074 0.19 0.245, -0.096 0.16 0.245, -0.151 0.16 0.245, -0.2 0.155 0.245, -0.236 0.107 0.245, -0.256 0.056 0.245, -0.264 0 0.245, -0.256 -0.056 0.245, -0.236 -0.107 0.245, -0.2 -0.155 0.245, -0.151 -0.16 0.245, -0.096 -0.16 0.245, -0.074 -0.19 0.245, 0.064 -0.19 0.245, 0.112 -0.155 0.245, 0.145 -0.107 0.245, 0.166 -0.056 0.245, 0.174 0 0.245
+          ]
+        }
+        coordIndex [
+          22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, -1, 0, 1, 24, 23, -1, 1, 2, 25, 24, -1, 2, 3, 26, 25, -1, 3, 4, 27, 26, -1, 4, 5, 28, 27, -1, 5, 6, 29, 28, -1, 6, 7, 30, 29, -1, 7, 8, 31, 30, -1, 8, 9, 32, 31, -1, 9, 10, 33, 32, -1, 10, 11, 34, 33, -1, 11, 12, 35, 34, -1, 12, 13, 36, 35, -1, 13, 14, 37, 36, -1, 14, 15, 38, 37, -1, 15, 16, 39, 38, -1, 16, 17, 40, 39, -1, 17, 18, 41, 40, -1, 18, 19, 42, 41, -1, 19, 20, 43, 42, -1, 20, 21, 44, 43, -1, 21, 22, 45, 44, -1
+        ]
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4075.366757841908
+        axis 0 1 0
+        anchor 0 0 0.0825
+      }
+      device [
+        RotationalMotor {
+          name "left wheel motor"
+        }
+        PositionSensor {
+          name "left wheel sensor"
+        }
+      ]
+      endPoint Solid {
+        translation 0 0.1603 0.0825
+        rotation -0.7054621803423076 0.7054623549383037 0.06816141042833544 3.27770507445067
+        children [
+          DEF WHEEL Pose {
+            rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 -2.093935
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0.0037037 0.0037037 0.0037037
+                  roughness 0.3
+                  metalness 0
+                }
+                geometry Cylinder {
+                  height 0.037
+                  radius 0.0825
+                }
+              }
+            ]
+          }
+        ]
+        name "left wheel"
+        boundingObject USE WHEEL
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 3310.680609484209
+        axis 0 1 0
+        anchor 0 0 0.0825
+      }
+      device [
+        RotationalMotor {
+          name "right wheel motor"
+        }
+        PositionSensor {
+          name "right wheel sensor"
+        }
+      ]
+      endPoint Solid {
+        translation 0 -0.16029999999999991 0.0825
+        rotation -0.7067481143183159 0.7067480637274659 0.03184772087579321 3.2052662206800457
+        children [
+          USE WHEEL
+        ]
+        name "right wheel"
+        boundingObject USE WHEEL
+      }
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.3
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            0.046 -0.136 0.184
+            0.096 -0.136 0.184
+            0.134 -0.101 0.184
+            0.159 -0.054 0.184
+            0.168 0 0.184
+            0.159 0.054 0.184
+            0.134 0.101 0.184
+            0.096 0.136 0.184
+            0.046 0.136 0.184
+            0.043 -0.136 0.184
+            0.046 -0.136 0.234
+            0.096 -0.136 0.234
+            0.134 -0.101 0.234
+            0.159 -0.054 0.234
+            0.168 0 0.234
+            0.159 0.054 0.234
+            0.134 0.101 0.234
+            0.096 0.136 0.234
+            0.046 0.136 0.234
+            0.043 -0.136 0.234
+          ]
+        }
+        coordIndex [
+          9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, -1, 0, 1, 11, 10, -1, 1, 2, 12, 11, -1, 2, 3, 13, 12, -1, 3, 4, 14, 13, -1, 4, 5, 15, 14, -1, 5, 6, 16, 15, -1, 6, 7, 17, 16, -1, 7, 8, 18, 17, -1, 8, 9, 19, 18, -1, 9, 0, 10, 19, -1
+        ]
+      }
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.3
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -0.135 0.136 0.184
+            -0.185 0.136 0.184
+            -0.223 0.101 0.184
+            -0.248 0.054 0.184
+            -0.257 0 0.184
+            -0.248 -0.054 0.184
+            -0.223 -0.101 0.184
+            -0.185 -0.136 0.184
+            -0.135 -0.136 0.184
+            -0.135 0.136 0.184
+            -0.135 0.136 0.234
+            -0.185 0.136 0.234
+            -0.223 0.101 0.234
+            -0.248 0.054 0.234
+            -0.257 0 0.234
+            -0.248 -0.054 0.234
+            -0.223 -0.101 0.234
+            -0.185 -0.136 0.234
+            -0.135 -0.136 0.234
+            -0.135 0.136 0.234
+          ]
+        }
+        coordIndex [
+          9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, -1, 0, 1, 11, 10, -1, 1, 2, 12, 11, -1, 2, 3, 13, 12, -1, 3, 4, 14, 13, -1, 4, 5, 15, 14, -1, 5, 6, 16, 15, -1, 6, 7, 17, 16, -1, 7, 8, 18, 17, -1, 8, 9, 19, 18, -1
+        ]
+      }
+    }
+    Pose {
+      translation -0.2147 0 0.0325
+      rotation 0.5771968951617173 0.5771968951617173 0.577656895078166 -2.093935
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.0037037 0.0037037 0.0037037
+            roughness 0.3
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.024
+            radius 0.0325
+          }
+        }
+      ]
+    }
+    DistanceSensor {
+      translation 0.164 0.027 0.209
+      rotation 0 0 1 0.174203
+      children [
+        DEF SONAR Pose {
+          rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 -2.093935
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 1 1 0.0517103
+                roughness 0.3
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.002
+                radius 0.0175
+              }
+            }
+          ]
+        }
+      ]
+      name "ds0"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.147 0.077 0.209
+      rotation 0.9352057350394192 0.25038992906003615 0.25038992906003615 1.637735
+      children [
+        USE SONAR
+      ]
+      name "ds1"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.116 0.118 0.209
+      rotation 0.8349694730900802 0.38911822047269523 0.38911822047269523 1.750187
+      children [
+        USE SONAR
+      ]
+      name "ds2"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.071 0.136 0.209
+      rotation 0.5779627730800116 0.5770437734408297 0.5770437734408297 2.093476
+      children [
+        USE SONAR
+      ]
+      name "ds3"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.16 0.136 0.209
+      rotation -0.5767367732078247 -0.5776567728460501 -0.5776567728460501 -2.095315
+      children [
+        USE SONAR
+      ]
+      name "ds4"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.205 0.118 0.209
+      rotation -0.31297577647997865 -0.6715825203713816 -0.6715825203713816 -2.534956
+      children [
+        USE SONAR
+      ]
+      name "ds5"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.236 0.077 0.209
+      rotation -0.1860148912057814 -0.6947655936536081 -0.6947655936536081 -2.773767
+      children [
+        USE SONAR
+      ]
+      name "ds6"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.253 0.027 0.209
+      rotation -0.06162897048037732 -0.7057626619471765 -0.7057626619471765 -3.01849
+      children [
+        USE SONAR
+      ]
+      name "ds7"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.253 -0.027 0.209
+      rotation -0.06183904155773597 0.7057534742880195 0.7057534742880195 -3.018072
+      children [
+        USE SONAR
+      ]
+      name "ds8"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.236 -0.077 0.209
+      rotation -0.1862280124472945 0.6947370464355309 0.6947370464355309 -2.773355
+      children [
+        USE SONAR
+      ]
+      name "ds9"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.205 -0.118 0.209
+      rotation -0.31319385347479545 0.6715316858293465 0.6715316858293465 -2.534558
+      children [
+        USE SONAR
+      ]
+      name "ds10"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation -0.16 -0.136 0.209
+      rotation 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 2.094395
+      children [
+        USE SONAR
+      ]
+      name "ds11"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.071 -0.136 0.209
+      rotation 0.5773502691896258 -0.5773502691896258 -0.5773502691896258 2.094395
+      children [
+        USE SONAR
+      ]
+      name "ds12"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.116 -0.118 0.209
+      rotation 0.8347739105773538 -0.38932795829441263 -0.38932795829441263 1.750417
+      children [
+        USE SONAR
+      ]
+      name "ds13"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.147 -0.077 0.209
+      rotation 0.9350669359988784 -0.25064898284420567 -0.25064898284420567 1.637883
+      children [
+        USE SONAR
+      ]
+      name "ds14"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+    DistanceSensor {
+      translation 0.164 -0.027 0.209
+      rotation -0.9924098511524273 0.08695598695782032 0.08695598695782032 -1.578415
+      children [
+        USE SONAR
+      ]
+      name "ds15"
+      lookupTable [
+        0 1024 0
+        0.2 1024 0.1
+        0.4 0 0.1
+      ]
+      type "infra-red"
+    }
+  ]
+  name "Pioneer 2"
+  description "designed by Activmedia Robotics"
+  boundingObject Pose {
+    translation -0.0447 0 0.13
+    rotation 0 0 1 -1.570796
+    children [
+      Cylinder {
+        height 0.24
+        radius 0.219
+      }
+    ]
+  }
   controller "my_first_controller0"
+}
+DEF wall1 Solid {
+  translation 0 2.47 0.26
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 5 0.1 0.5
+      }
+      isPickable FALSE
+    }
+  ]
+}
+DEF wall2 Solid {
+  translation 0 -2.41 0.26
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 5 0.1 0.5
+      }
+      isPickable FALSE
+    }
+  ]
+}
+DEF wall3 Solid {
+  translation -2.46 0.0200007 0.26
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 5 0.1 0.5
+      }
+      isPickable FALSE
+    }
+  ]
+}
+DEF wall4 Solid {
+  translation 2.49 0.0200038 0.26
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 5 0.1 0.5
+      }
+      isPickable FALSE
+    }
+  ]
+}
+Group {
+  children [
+    Solid {
+      translation -1.31 0.9 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 5"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+    Solid {
+      translation 0.21 0.9 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 3"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+    Solid {
+      translation 1.46 -1.06 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 2"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+    Solid {
+      translation -1.3 -1.06 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 6"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+    Solid {
+      translation 0.17 -1.06 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 4"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+    Solid {
+      translation 1.58 0.9 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.3 0.3 0.5
+          }
+        }
+      ]
+      name "Pillar 1"
+      boundingObject Box {
+        size 0.3 0.3 0.5
+      }
+    }
+  ]
+}
+Group {
+  children [
+    Solid {
+      translation -2.25 2.29 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 1"
+    }
+    Solid {
+      translation -2.25 -2.24 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 2"
+    }
+    Solid {
+      translation 2.26 -2.23 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 3"
+    }
+    Solid {
+      translation 2.26 2.26 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 4"
+    }
+  ]
 }
