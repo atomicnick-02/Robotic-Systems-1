@@ -4,8 +4,8 @@ simulationViewPerspectives: 000000ff0000000100000002000001f600000315010000000201
 sceneTreePerspectives: 000000ff00000001000000030000001c000002af000000fa0100000002010000000200
 maximizedDockId: -1
 centralWidgetVisible: 1
+renderingMode: PLAIN
 orthographicViewHeight: 1
 textFiles: -1
-globalOptionalRendering: CameraFrustums
 consoles: Console:All:All
-renderingDevicePerspectives: Pioneer 2:camera;1;1;0;0
+renderingDevicePerspectives: Pioneer 2:camera;0;2.73547;0.764444;0.590116

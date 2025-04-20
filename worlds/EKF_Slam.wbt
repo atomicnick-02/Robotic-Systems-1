@@ -7,8 +7,10 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.1684172002760585 0.9744904264385864 -0.14833763996611213 1.175327549327373
-  position -4.579706473046831 -0.0715195507924038 7.502418226739905
+  orientation -0.45238331738146903 0.49351889621116424 0.7428246315500389 1.9192046467866082
+  position -0.22894353861323458 -2.4641913502600676 5.599817749913701
+  follow "Pioneer 2"
+  followType "Mounted Shot"
 }
 TexturedBackground {
 }
@@ -18,7 +20,6 @@ RectangleArena {
   floorSize 5 5
 }
 Robot {
-  translation 0.05 0 0
   children [
     Camera {
       translation 0.11 0 0.29
@@ -102,7 +103,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 4075.366757841908
+        position 4183.0468133787135
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -115,8 +116,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.1603 0.0825
-        rotation -0.7054621803423076 0.7054623549383037 0.06816141042833544 3.27770507445067
+        translation 0 0.16030000000000003 0.0825
+        rotation 0.65341942857987 -0.6534195683572452 -0.38221187585184624 2.4114356633751655
         children [
           DEF WHEEL Pose {
             rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 -2.093935
@@ -141,7 +142,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3310.680609484209
+        position 3398.8810723164834
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -154,8 +155,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 -0.16029999999999991 0.0825
-        rotation -0.7067481143183159 0.7067480637274659 0.03184772087579321 3.2052662206800457
+        translation 0 -0.16029999999999986 0.0825
+        rotation -0.7023754887091506 0.7023754590659655 0.11548760696480052 3.3715487788083958
         children [
           USE WHEEL
         ]
