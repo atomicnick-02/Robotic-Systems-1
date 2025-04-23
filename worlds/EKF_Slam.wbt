@@ -7,8 +7,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.02845334280233219 0.9577559701724254 0.28617111818359525 0.20698466458859496
-  position -2.2830696806775137 -0.305413364336219 1.0383984492809375
+  orientation 0.04321081773730605 0.7804991841389342 -0.6236616460781691 0.1770123219940242
+  position -2.0316005857945925 0.08533218414109611 0.7337851473553325
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -21,7 +21,6 @@ RectangleArena {
   floorSize 5 5
 }
 Robot {
-  rotation 0 0 1 -0.03616630919573202
   children [
     Camera {
       translation 0.11 0 0.29
@@ -43,8 +42,8 @@ Robot {
       recognitionColors [
         0 0 0
       ]
-      width 480
-      height 720
+      width 128
+      height 128
       near 0.1
       far 5
       lens Lens {
@@ -107,7 +106,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 4205.839436379105
+        position 4206.4026363791045
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -120,8 +119,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16030000000000003 0.0825
-        rotation 0.6254683289174311 -0.6254685199419816 0.4664531059847531 4.014496330246049
+        translation 0 0.1602999999999998 0.0825
+        rotation 0.6834292858973811 -0.6834294772239078 0.25660974424065053 3.643972405827387
         children [
           DEF WHEEL Pose {
             rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 -2.093935
@@ -146,7 +145,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3418.98122964837
+        position 3419.5444296483706
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -159,8 +158,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 -0.16029999999999986 0.0825
-        rotation 0.5762429110005955 -0.5762430060063635 -0.5795585436781256 2.0910861420907176
+        translation 0 -0.1602999999999997 0.0825
+        rotation 0.43290761773138187 -0.43290777655131435 -0.7906844196716771 1.8035231803825735
         children [
           USE WHEEL
         ]
@@ -585,7 +584,7 @@ DEF Pillars Group {
       }
     }
     Solid {
-      translation 1.39 0.9 0.25
+      translation 1.39 1.06 0.25
       children [
         Shape {
           appearance PBRAppearance {
@@ -601,7 +600,7 @@ DEF Pillars Group {
       }
     }
     Solid {
-      translation 0.21 0.9 0.25
+      translation 0.21 1.08 0.25
       children [
         Shape {
           appearance PBRAppearance {
@@ -742,7 +741,7 @@ Group {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/apriltags/pillar1.png"
+                "../apriltags36h11_100by100/Screenshot 2025-04-23 at 16-33-08 April Tag generator.png"
               ]
             }
             roughness 0.6

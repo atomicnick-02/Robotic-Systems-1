@@ -1,6 +1,6 @@
 from controller import Robot, Camera, DistanceSensor, Motor
 from test_lib import AprilTagDetector
-
+import numpy as np
 # Constants
 MAX_SENSOR_NUMBER = 16
 RANGE = 1024 / 2
@@ -92,16 +92,17 @@ def run():
     robot = Robot()
     ctx = initialize(robot)
     april_tag_detector = AprilTagDetector()
-
+    
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
-        if ctx['camera']:
-            ctx['camera'].getImage()
 
+    
         # Detect AprilTags
         if ctx['camera']:
             image = ctx['camera'].getImage()
+            # Turn image from bytes to a numpy array
             corners, ids, rejected = april_tag_detector.detect(image)
+            # print(corners)
             if len(corners) > 0:
                 april_tag_detector.draw(image, corners, ids)
                 print("Detected:", ids)
