@@ -1,4 +1,5 @@
 from controller import Robot, Camera, DistanceSensor, Motor
+from test_lib import AprilTagDetector
 
 # Constants
 MAX_SENSOR_NUMBER = 16
@@ -90,11 +91,20 @@ def initialize(robot):
 def run():
     robot = Robot()
     ctx = initialize(robot)
+    april_tag_detector = AprilTagDetector()
 
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
         if ctx['camera']:
             ctx['camera'].getImage()
+
+        # Detect AprilTags
+        if ctx['camera']:
+            image = ctx['camera'].getImage()
+            corners, ids, rejected = april_tag_detector.detect(image)
+            if len(corners) > 0:
+                april_tag_detector.draw(image, corners, ids)
+                print("Detected:", ids)
 
         # Read sensor values
         readings = [ds.getValue() for ds in ctx['sensors']]
