@@ -101,11 +101,11 @@ def run():
         if ctx['camera']:
             image = ctx['camera'].getImage()
             # Turn image from bytes to a numpy array
-            corners, ids, rejected = april_tag_detector.detect(image)
+            # corners, ids, rejected = april_tag_detector.detect(image)
             # print(corners)
-            if len(corners) > 0:
-                april_tag_detector.draw(image, corners, ids)
-                print("Detected:", ids)
+            # if len(corners) > 0:
+            #     april_tag_detector.draw(image, corners, ids)
+            #     print("Detected:", ids)
 
         # Read sensor values
         readings = [ds.getValue() for ds in ctx['sensors']]
