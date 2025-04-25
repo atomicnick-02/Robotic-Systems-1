@@ -1,6 +1,7 @@
 from controller import Robot, Camera, DistanceSensor, Motor
-from test_lib import AprilTagDetector
 import numpy as np
+import cv2
+import apriltag
 # Constants
 MAX_SENSOR_NUMBER = 16
 RANGE = 1024 / 2
@@ -91,7 +92,6 @@ def initialize(robot):
 def run():
     robot = Robot()
     ctx = initialize(robot)
-    april_tag_detector = AprilTagDetector()
     
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
@@ -99,14 +99,34 @@ def run():
     
         # Detect AprilTags
         if ctx['camera']:
-            image = ctx['camera'].getImage()
-            # get focal length in x and yand principal point
-            focal_length_x = ctx['camera'].getFocalLength()
-            focal_length_y = ctx['camera'].getFocalLength()
-            focal_length = (focal_length_x, focal_length_y)
-            principal_point = ctx['camera'].getWidth() / 2, ctx['camera'].getHeight() / 2
-            print(f"focal_length {focal_length} principal_point {principal_point}")
-
+            image = ctx['camera'].getImage() # 240 by 240
+            # save image to file
+            # print("Image size:", ctx['camera'].getWidth(), ctx['camera'].getHeight())
+            buf_as_np_array = np.frombuffer(image, np.uint8)
+            size = ctx['camera'].getWidth() 
+            rgb = buf_as_np_array.reshape(size, size , 4)
+            ctx['camera'].saveImage("image.jpg", 100)
+            
+            # print(f"Image shape: {rgb.shape}")
+            
+            # Convert to grayscale
+            gray = cv2.cvtColor(rgb, cv2.COLOR_BGRA2GRAY)
+            # print("Gray shape:", gray.shape)
+            # Initialize AprilTag detector for tag36h11 family
+            options = apriltag.DetectorOptions(
+                families='tag36h11',
+                nthreads=4,
+                quad_decimate=1.0,
+                refine_edges=1,
+            )
+            detector = apriltag.Detector(options)
+            # Detect tags
+            results = detector.detect(gray)
+            # Process detections
+            if results:
+                print(f"Found {len(results)} tags")
+                # pause the simulation
+                # robot.step(1000)
             # Turn image from bytes to a numpy array
             # corners, ids, rejected = april_tag_detector.detect(image)
             # print(corners)

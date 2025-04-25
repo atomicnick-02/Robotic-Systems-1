@@ -9,19 +9,22 @@ def detect_apriltag(image_path):
 		print(f"Error: Could not load image from {image_path}")
 		return
 
+	# turn image from png to jpg
+	cv2.imwrite('temp.jpg', image)
+	image = cv2.imread('temp.jpg')
+	
 	# Convert to grayscale
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 	# Initialize AprilTag detector for tag36h11 family
-	detector = apriltag.DetectorOptions(
+	options = apriltag.DetectorOptions(
 		families='tag36h11',
 		nthreads=4,
 		quad_decimate=1.0,
-		quad_sigma=0.6,
 		refine_edges=1,
-		decode_sharpening=0.25,
-		hamming_dist=2  # Allows up to 2 bits of error
+		
 	)
+	detector = apriltag.Detector(options)
 
 	# Detect tags
 	results = detector.detect(gray)
@@ -77,23 +80,11 @@ def detect_webcam():
 
 	cap.release()
 	cv2.destroyAllWindows()
-if __name__ == "__main__":
-	# Use either a file path or 0 for webcam
-	# detect_apriltag("your_image.jpg")  # Replace with your image path
-	detect_webcam()  # Uncomment to use webcam
+
 def main():
-	path = "apriltags36h11_100by100/tag36_11_00001.png"
-	detect_apriltag(path)
-
-
-	path = "apriltags36h11_100by100/pillar1.png"
-	detect_apriltag(path)
-	
-		
-	path = "apriltags36h11_100by100/first_sample.png"
-	detect_apriltag(path)
-	
-
+	# Use either a file path or 0 for webcam
+	detect_apriltag("/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/apriltags36h11_100by100/Screenshot from 2025-04-25 19-48-59.png")  # Replace with your image path
+	# detect_webcam()  # Uncomment to use webcam
 if __name__ == "__main__":
 	main()
 	
