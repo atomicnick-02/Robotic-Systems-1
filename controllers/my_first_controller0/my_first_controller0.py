@@ -100,6 +100,13 @@ def run():
         # Detect AprilTags
         if ctx['camera']:
             image = ctx['camera'].getImage()
+            # get focal length in x and yand principal point
+            focal_length_x = ctx['camera'].getFocalLength()
+            focal_length_y = ctx['camera'].getFocalLength()
+            focal_length = (focal_length_x, focal_length_y)
+            principal_point = ctx['camera'].getWidth() / 2, ctx['camera'].getHeight() / 2
+            print(f"focal_length {focal_length} principal_point {principal_point}")
+
             # Turn image from bytes to a numpy array
             # corners, ids, rejected = april_tag_detector.detect(image)
             # print(corners)
