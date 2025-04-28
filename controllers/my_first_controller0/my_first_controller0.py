@@ -1,4 +1,4 @@
-from controller import Robot, Camera, DistanceSensor, Motor
+from controller import Robot, Node
 import numpy as np
 import cv2
 import apriltag
@@ -22,6 +22,7 @@ def initialize(robot):
     # Robot name
     robot_name = robot.getName()
 
+
     # Default parameters
     camera_enabled = True
     range_val = RANGE
@@ -44,7 +45,9 @@ def initialize(robot):
         num_sensors = 16
         sensor_prefix = "ds"
         weights = pioneer2_matrix
-        max_speed = 5.0
+        calibration_sensor = 1
+        cal_sesnor_prefix = "cal_ds"
+        max_speed = 3.0
         speed_unit = 0.3
     else:
         print("This controller doesn't support robot:", robot_name)
@@ -57,6 +60,9 @@ def initialize(robot):
         ds = robot.getDevice(name)
         ds.enable(time_step)
         sensors.append(ds)
+    # Initialize calibration sensor
+    cal_ds = robot.getDevice(f"{cal_sesnor_prefix}{calibration_sensor-1}")
+    cal_ds.enable(time_step)
 
     # Initialize motors
     left_motor = robot.getDevice("left wheel motor")
@@ -86,7 +92,9 @@ def initialize(robot):
         'speed_unit': speed_unit,
         'left_motor': left_motor,
         'right_motor': right_motor,
-        'camera': cam
+        'camera': cam,
+
+        'cal_ds': cal_ds,
     }
 
 
@@ -95,23 +103,30 @@ def run():
     ctx = initialize(robot)
     # Initialize AprilTag detector
     if ctx['camera']:
-        ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'])
+        ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
         print("AprilTag detector initialized.")
+    # cal_ds = ctx['cal_ds']
+    # print all keys in ctx
+    print(ctx.keys())
+    
+
     
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
-
     
         # Detect AprilTags
         if ctx['camera']:
             # Get the image from the camera
             ctx['AprilTagDetector'].detect(ctx['camera'].getImage())
             
-           
+        #read the calibration sensor
 
+        cal_ds_value = ctx['cal_ds'].getValue()    
+        print("Calibration sensor value:", cal_ds_value)
         # Read sensor values
         readings = [ds.getValue() for ds in ctx['sensors']]
-
+        # print the value of ds0
+        # print("Sensor values:", readings)
         # Braitenberg: compute wheel speeds
         speed_l = 0.0
         speed_r = 0.0
@@ -127,6 +142,7 @@ def run():
         # Set velocities
         ctx['left_motor'].setVelocity(speed_l)
         ctx['right_motor'].setVelocity(speed_r)
+        
 
 
 if __name__ == "__main__":
