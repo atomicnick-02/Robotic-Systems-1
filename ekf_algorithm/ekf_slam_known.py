@@ -8,7 +8,7 @@ def wrap_angle(angle):
 # Initialize variables
 def initialize_ekf():
     mu = np.zeros(3)  # Initial state [x, y, theta]
-    Sigma = np.eye(3) * 1e-3
+    Sigma = np.zeros((3,3)) 
     return mu, Sigma
 
 # Main EKF SLAM with known correspondences
@@ -66,7 +66,7 @@ def ekf_slam_known_correspondences(mu, Sigma, u, z, c, R, Q, dt):
 
         H = (1 / q) * np.array([
             [-np.sqrt(q)*delta_x, -np.sqrt(q)*delta_y, 0,  np.sqrt(q)*delta_x,  np.sqrt(q)*delta_y],
-            [delta_y,            -delta_x,            -q, -delta_y,             delta_x]
+            [delta_y, -delta_x, -q, -delta_y, delta_x]
         ]) @ Fxj
 
         S = H @ Sigma_bar @ H.T + Q
@@ -92,7 +92,7 @@ def run_ekf_slam_test():
     path = [mu[:2].copy()]
     est_landmarks_over_time = []
 
-    for t in range(10):
+    for t in range(20):
         u = [1.0, np.deg2rad(10)] 
 
         z = []
