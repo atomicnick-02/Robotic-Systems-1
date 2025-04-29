@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import apriltag
+import dt_apriltags
 
 def detect_apriltag(image_path):
 	# Load image
@@ -17,51 +17,20 @@ def detect_apriltag(image_path):
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 	# Initialize AprilTag detector for tag36h11 family
-	options = apriltag.DetectorOptions(
+	detector = dt_apriltags.Detector(
 		families='tag36h11',
 		nthreads=4,
 		quad_decimate=1.0,
 		refine_edges=1,
-		
 	)
-	detector = apriltag.Detector(options)
-
-	# Detect tags
-	results = detector.detect(gray)
-
-	# Process detections
-	if not results:
-		print("No AprilTags detected")
-		return
-
-	print(f"Found {len(results)} tags")
 	
-	# Draw detections
-	for result in results:
-		# Extract detection information
-		tag_id = result.tag_id
-		corners = result.corners.astype(int)
-		center = result.center.astype(int)
-
-		# Draw polygon around the tag
-		cv2.polylines(image, [corners], isClosed=True, color=(0, 255, 0), thickness=2)
-		
-		# Draw center point
-		cv2.circle(image, tuple(center), radius=5, color=(0, 0, 255), thickness=-1)
-		
-		# Add text label
-		cv2.putText(image, f"ID: {tag_id}", (center[0] - 20, center[1] - 20),
-					cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-
-	# Display results
-	cv2.imshow("AprilTag Detection", image)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	camera_params = [800,800, 0, 0]  # Focal length and principal point
+	result = detector.detect(gray, estimate_tag_pose=True, camera_params=camera_params, tag_size=600)
+	print(f"Detected {len(result)} AprilTags")
+	print(result[0].pose_R)
 	
 def detect_webcam():
 	cap = cv2.VideoCapture(0)
-	options = apriltag.DetectorOptions(families='tag36h11')
-	detector = apriltag.Detector()
 	
 	while True:
 		ret, frame = cap.read()
@@ -83,7 +52,7 @@ def detect_webcam():
 
 def main():
 	# Use either a file path or 0 for webcam
-	detect_apriltag("/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/apriltags36h11_100by100/Screenshot from 2025-04-25 19-48-59.png")  # Replace with your image path
+	detect_apriltag("/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/apriltags36h11_100by100/tag36h11_100_1.png")  # Replace with your image path
 	# detect_webcam()  # Uncomment to use webcam
 if __name__ == "__main__":
 	main()

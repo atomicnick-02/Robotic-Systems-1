@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
-import apriltag
-import wpilib.cameraserver
- 
+import dt_apriltags
+
+np.set_printoptions(suppress = True, precision = 4)
 # supress scientific notation and use 4 decimal places
 # np.set_printoptions(suppress=True, precision=4)
 class AprilTagDetector:
@@ -10,15 +10,15 @@ class AprilTagDetector:
 		self.camera = camera
 		self.width = camera.getWidth()
 		self.height = camera.getHeight()
-		self.focal_length = camera.getFocalLength()
+		self.focal_length = camera.getFocalDistance()
 		self.robot = robot
-		options = apriltag.DetectorOptions(
+		self.detctor = dt_apriltags.Detector(
 			families='tag36h11',
 			nthreads=4,
 			quad_decimate=1.0,
 			refine_edges=1,
+			
 		)
-		self.detector = apriltag.Detector(options)
 		self.AprilTags = {} #This dict will hold the ID and the the distance from the robot
 
 	def detect(self, image):
@@ -26,34 +26,25 @@ class AprilTagDetector:
 		buf_as_np_array = np.frombuffer(image, np.uint8)
 		rgb = buf_as_np_array.reshape((self.height, self.width, 4))
 		gray = cv2.cvtColor(rgb, cv2.COLOR_BGRA2GRAY)
-		results = self.detector.detect(gray)
+		# Initialize AprilTag detector for tag36h11 family
+
+		detector = self.detctor
+		fx, fy = self.focal_length, self.focal_length
+		cx, cy = self.width/2, self.height/2
+		camera_params = [fx, fy, cx, cy]
+		print(camera_params)
+		# camera_params = [800,800, 0, 0]
+		result = detector.detect(gray, estimate_tag_pose=True, camera_params=camera_params, tag_size=0.6)
+		# if len(result) == 0:
+		# 	return
+		print(f"Detected {len(result)} AprilTags")
 		
-		# Clear previous detections
-		self.AprilTags = {}
-		
-		for r in results:
-			# Initially store the image coordinates
-			self.AprilTags[r.tag_id] = {"center": (r.center[0], r.center[1])}
-		
-		if len(results) > 0:
-			# Get the camera position and orientation
-			tag_transforms = self.get_apriltag_transform(gray, results)
-			
-			# Update with 3D position info
-			for tag_id, transform in tag_transforms.items():
-				# Extract the position vector (translation component of the transform)
-				position = transform[:3, 3]
-				
-				# Calculate Euclidean distance from camera to tag
-				distance = np.linalg.norm(position)
-				
-				# Update the dictionary with position and distance
-				if tag_id in self.AprilTags:
-					self.AprilTags[tag_id]["position"] = position
-					self.AprilTags[tag_id]["distance"] = distance
-					print(f"Tag ID: {tag_id}, Distance: {distance:.3f}m, Position: {position}")
-		
-		return self.AprilTags
+		print(result[0].pose_t.T)
+		# create a matrix that has 
+		# [[R, t], [0, 1]
+		answer = np.block([[result[0].pose_R, result[0].pose_t], [0, 0, 0, 1]])
+		print(answer)
+		return answer
 	def draw(self, image):
 		# draw the tags on the image
 		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

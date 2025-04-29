@@ -65,8 +65,8 @@ Robot {
       height 256
       far 6
       antiAliasing TRUE
-      lens Lens {
-        center 0 0
+      focus Focus {
+        focalLength 100
       }
     }
     Group {
@@ -137,7 +137,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16029999999999975 0.0825
+        translation 0 0.1602999999999997 0.0825
         rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
         children [
           DEF WHEEL Pose {
@@ -177,7 +177,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080519 -0.6576489613697535 -0.36741765696608697 2.43737974683996
+        rotation 0.6576489253080517 -0.6576489613697533 -0.36741765696608697 2.43737974683996
         children [
           USE WHEEL
         ]

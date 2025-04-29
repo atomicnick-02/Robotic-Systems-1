@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import apriltag
 from ApriltagDetector import AprilTagDetector
+
 # Constants
 MAX_SENSOR_NUMBER = 16
 RANGE = 1024 / 2
@@ -103,6 +104,7 @@ def run():
     ctx = initialize(robot)
     # Initialize AprilTag detector
     if ctx['camera']:
+        print("focal length:", ctx['camera'].getFocalLength())
         ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
         print("AprilTag detector initialized.")
     # cal_ds = ctx['cal_ds']
@@ -117,11 +119,12 @@ def run():
         # Detect AprilTags
         if ctx['camera']:
             # Get the image from the camera
-            ctx['AprilTagDetector'].detect(ctx['camera'].getImage())
+            image = ctx['camera'].getImage()
+            ctx['AprilTagDetector'].detect(image)
             
         #read the calibration sensor
 
-        cal_ds_value = ctx['cal_ds'].getValue()    
+        cal_ds_value = ctx['cal_ds'].getValue()
         print("Calibration sensor value:", cal_ds_value)
         # Read sensor values
         readings = [ds.getValue() for ds in ctx['sensors']]
