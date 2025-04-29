@@ -10,7 +10,7 @@ class AprilTagDetector:
 		self.camera = camera
 		self.width = camera.getWidth()
 		self.height = camera.getHeight()
-		self.focal_length = camera.getFocalDistance()
+		self.foc_distance = camera.getFocalDistance()
 		self.robot = robot
 		self.detctor = dt_apriltags.Detector(
 			families='tag36h11',
@@ -29,7 +29,10 @@ class AprilTagDetector:
 		# Initialize AprilTag detector for tag36h11 family
 
 		detector = self.detctor
+		fx, fy = self.foc_distance, self.foc_distance
+		self.focal_length = 256
 		fx, fy = self.focal_length, self.focal_length
+
 		cx, cy = self.width/2, self.height/2
 		camera_params = [fx, fy, cx, cy]
 		print(camera_params)
@@ -38,12 +41,13 @@ class AprilTagDetector:
 		# if len(result) == 0:
 		# 	return
 		print(f"Detected {len(result)} AprilTags")
-		
+		if len(result) == 0:
+			return
 		print(result[0].pose_t.T)
 		# create a matrix that has 
 		# [[R, t], [0, 1]
 		answer = np.block([[result[0].pose_R, result[0].pose_t], [0, 0, 0, 1]])
-		print(answer)
+		# print(answer)
 		return answer
 	def draw(self, image):
 		# draw the tags on the image

@@ -61,8 +61,9 @@ def initialize(robot):
         ds = robot.getDevice(name)
         ds.enable(time_step)
         sensors.append(ds)
+
     # Initialize calibration sensor
-    cal_ds = robot.getDevice(f"{cal_sesnor_prefix}{calibration_sensor-1}")
+    cal_ds = robot.getDevice(f"{cal_sesnor_prefix}")
     cal_ds.enable(time_step)
 
     # Initialize motors
@@ -109,9 +110,6 @@ def run():
         print("AprilTag detector initialized.")
     # cal_ds = ctx['cal_ds']
     # print all keys in ctx
-    print(ctx.keys())
-    
-
     
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
