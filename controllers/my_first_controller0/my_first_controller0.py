@@ -49,7 +49,7 @@ def initialize(robot):
         weights = pioneer2_matrix
         calibration_sensor = 1
         cal_sesnor_prefix = "cal_ds"
-        max_speed = 3.0
+        max_speed = 10.0
         speed_unit = 0.3
     else:
         print("This controller doesn't support robot:", robot_name)
@@ -80,7 +80,6 @@ def initialize(robot):
     if camera_enabled:
         cam = robot.getDevice("camera")
         cam.enable(time_step)
-        # cam.recognitionEnable(time_step)
         print(f"Camera enabled with FOV: {cam.getFov()} rad")
 
 
@@ -127,7 +126,7 @@ def run():
         cal_ds_value = ctx['cal_ds'].getValue()
         if res is None:
             continue
-        print(f"Sensor: {cal_ds_value:.3f} image: {res[:3,3][0]:.3f} Deviation: {((res[:3,3][0] - cal_ds_value) / cal_ds_value * 100):.3f}")
+        # print(f"Sensor: {cal_ds_value:.3f} image: {res[:3,3][0]:.3f} Deviation: {((res[:3,3][0] - cal_ds_value) / cal_ds_value * 100):.3f}")
         readings = [ds.getValue() for ds in ctx['sensors']]
         # print the value of ds0
         # if a sensor readind is detected that is not 0, print it
