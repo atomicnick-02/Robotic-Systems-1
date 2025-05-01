@@ -30,12 +30,11 @@ Robot {
   children [
     DistanceSensor {
       translation 0 0 0.3
-      name "cal_ds0"
+      name "cal_ds"
       lookupTable [
-        4 4 0
-        2 2 0
-        0 0 0
-        1 1 0
+        0 0 0.01
+        1 200 0.001
+        2.5 250 0.001
       ]
       type "infra-red"
     }
@@ -137,7 +136,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.1602999999999997 0.0825
+        translation 0 0.16029999999999964 0.0825
         rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
         children [
           DEF WHEEL Pose {
@@ -177,7 +176,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080517 -0.6576489613697533 -0.36741765696608697 2.43737974683996
+        rotation 0.6576489253080519 -0.6576489613697534 -0.367417656966087 2.43737974683996
         children [
           USE WHEEL
         ]

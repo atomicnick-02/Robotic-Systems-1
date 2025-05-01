@@ -22,6 +22,7 @@ class AprilTagDetector:
 		self.AprilTags = {} #This dict will hold the ID and the the distance from the robot
 
 	def detect(self, image):
+		# print("#    Detecting AprilTags... #")
 		# process the image to get the AprilTag
 		buf_as_np_array = np.frombuffer(image, np.uint8)
 		rgb = buf_as_np_array.reshape((self.height, self.width, 4))
@@ -30,20 +31,25 @@ class AprilTagDetector:
 
 		detector = self.detctor
 		fx, fy = self.foc_distance, self.foc_distance
-		self.focal_length = 256
-		fx, fy = self.focal_length, self.focal_length
+		self.focal_length = 18900
 
+		fx, fy = self.focal_length, self.focal_length
 		cx, cy = self.width/2, self.height/2
 		camera_params = [fx, fy, cx, cy]
-		print(camera_params)
-		# camera_params = [800,800, 0, 0]
+		# print(f"-------------------------------------------------------------------")
+		# print(f"[fx, fy, cx, cy]: {camera_params}")
+		# print(f"Camera focal length {self.camera.getFocalLength()} camera focal distance {self.camera.getFocalDistance()}")
+		# print(f"-------------------------------------------------------------------")
+		
 		result = detector.detect(gray, estimate_tag_pose=True, camera_params=camera_params, tag_size=0.6)
 		# if len(result) == 0:
 		# 	return
-		print(f"Detected {len(result)} AprilTags")
 		if len(result) == 0:
 			return
-		print(result[0].pose_t.T)
+		# Rotate the result by 90 degrees
+		result[0].pose_R = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ result[0].pose_R
+		result[0].pose_t = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ result[0].pose_t
+		# print(result[0].pose_t.T)
 		# create a matrix that has 
 		# [[R, t], [0, 1]
 		answer = np.block([[result[0].pose_R, result[0].pose_t], [0, 0, 0, 1]])

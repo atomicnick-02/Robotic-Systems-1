@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import apriltag
 from ApriltagDetector import AprilTagDetector
+np.set_printoptions(suppress = True, precision = 4)
 
 # Constants
 MAX_SENSOR_NUMBER = 16
@@ -109,7 +110,8 @@ def run():
         ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
         print("AprilTag detector initialized.")
     # cal_ds = ctx['cal_ds']
-    # print all keys in ctx
+    
+    res = None
     
     while robot.step(ctx['time_step']) != -1:
         # Refresh camera image
@@ -118,16 +120,18 @@ def run():
         if ctx['camera']:
             # Get the image from the camera
             image = ctx['camera'].getImage()
-            ctx['AprilTagDetector'].detect(image)
+            res = ctx['AprilTagDetector'].detect(image)
             
         #read the calibration sensor
 
         cal_ds_value = ctx['cal_ds'].getValue()
-        print("Calibration sensor value:", cal_ds_value)
-        # Read sensor values
+        if res is None:
+            continue
+        print(f"Sensor: {cal_ds_value:.3f} image: {res[:3,3][0]:.3f} Deviation: {((res[:3,3][0] - cal_ds_value) / cal_ds_value * 100):.3f}")
         readings = [ds.getValue() for ds in ctx['sensors']]
         # print the value of ds0
-        # print("Sensor values:", readings)
+        # if a sensor readind is detected that is not 0, print it
+
         # Braitenberg: compute wheel speeds
         speed_l = 0.0
         speed_r = 0.0
