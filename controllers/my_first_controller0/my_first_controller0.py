@@ -122,9 +122,7 @@ def run():
 		#read the calibration sensor
 
 		cal_ds_value = ctx['cal_ds'].getValue()
-		if res is None:
-			continue
-		# print(f"Sensor: {cal_ds_value:.3f} image: {res[:3,3][0]:.3f} Deviation: {((res[:3,3][0] - cal_ds_value) / cal_ds_value * 100):.3f}")
+
 		readings = [ds.getValue() for ds in ctx['sensors']]
 		# print the value of ds0
 		# if a sensor readind is detected that is not 0, print it

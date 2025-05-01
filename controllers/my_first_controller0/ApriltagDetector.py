@@ -56,4 +56,4 @@ class AprilTagDetector:
 		print("_" * 20)
 		#TODO - Use the Likelihood Ratio Test to determine if two tags are the same
 		# print the tags
-		return self.AprilTags
+		return tag_locs
