@@ -9,8 +9,8 @@ WorldInfo {
   basicTimeStep 10
 }
 Viewpoint {
-  orientation -0.06244357190076222 -0.8877053319465228 0.45615791559720653 5.977227246341113
-  position -1.1091401939836003 0.045975803175094504 0.9787163887205251
+  orientation 0.004770643098465993 -0.9994214363082105 -0.03367541554399167 6.000975019442033
+  position -4.5654281531363425 -0.9722883995484101 1.806758435962351
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -29,7 +29,7 @@ RectangleArena {
 Robot {
   children [
     DistanceSensor {
-      translation 0 0 0.3
+      translation 0.1 0 0.3
       name "cal_ds"
       lookupTable [
         0 0 0.01
@@ -37,7 +37,7 @@ Robot {
       ]
     }
     Camera {
-      translation 0 0 0.3
+      translation 0.11 0 0.3
       rotation 0 -1 0 0
       children [
         Shape {
@@ -57,7 +57,7 @@ Robot {
       recognitionColors [
         0 0 0
       ]
-      fieldOfView 1.2
+      fieldOfView 1.5708
       width 512
       height 512
       far 6
@@ -134,7 +134,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16029999999999958 0.0825
+        translation 0 0.16029999999999953 0.0825
         rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
         children [
           DEF WHEEL Pose {
@@ -174,7 +174,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080519 -0.6576489613697534 -0.3674176569660871 2.43737974683996
+        rotation 0.6576489253080517 -0.6576489613697534 -0.36741765696608714 2.43737974683996
         children [
           USE WHEEL
         ]
@@ -594,7 +594,7 @@ Group {
     DEF pic0 Transform {
       translation 2.5 0 0.3
       rotation 0 0 1 3.14154
-      scale 0.0001 0.6 0.6
+      scale 0.01 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -662,7 +662,7 @@ Group {
     DEF pic0 Transform {
       translation 2.5 -0.6 0.3
       rotation 0 0 1 3.14154
-      scale 0.0001 0.6 0.6
+      scale 0.01 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -728,9 +728,145 @@ Group {
       rotationStep 0
     }
     DEF pic1 Transform {
-      translation 0.217225 -2.43557 0.261597
+      translation 0.217225 -2.43557 0.3
       rotation -0.013653703288840323 -0.0048045511572978586 0.9998952408500988 1.56929
       scale 0.05 0.3 0.3
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 1.46726 -0.991583 0.3
+      rotation -0.010864305201597221 0.0010029104801721114 0.9999404787501381 2.43004
+      scale 0.05 0.6 0.6
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 1.1551 0.411184 0.3
+      rotation -0.007545261769479264 0.007911791855436175 0.9999402345012758 -2.4191153071795863
+      scale 0.05 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -932,7 +1068,7 @@ Group {
       rotationStep 0
     }
     DEF pic4 Transform {
-      translation 1.04594 -0.00999818 -0.0224921
+      translation 1.04594 1.03425 -0.0224921
       rotation 0.7016342644018606 -9.114583434713698e-07 0.7125372685105177 3.14159
       scale 0.05 0.3 0.3
       children [
