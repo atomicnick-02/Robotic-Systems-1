@@ -1,8 +1,7 @@
-from controller import Robot, Node
+from controller import Robot
 import numpy as np
-import cv2
-import apriltag
-from ApriltagDetector import AprilTagDetector
+
+from source.ApriltagDetector import AprilTagDetector
 np.set_printoptions(suppress = True, precision = 4)
 
 # Constants
@@ -23,7 +22,6 @@ def initialize(robot) -> dict:
 	time_step = int(robot.getBasicTimeStep())
 	# Robot name
 	robot_name = robot.getName()
-
 
 	# Default parameters
 	camera_enabled = True
@@ -120,7 +118,6 @@ def run():
 			res = ctx['AprilTagDetector'].detect(image)
 			
 		#read the calibration sensor
-
 		cal_ds_value = ctx['cal_ds'].getValue()
 
 		readings = [ds.getValue() for ds in ctx['sensors']]
