@@ -1,142 +1,148 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Helper functions
 def wrap_angle(angle):
     return (angle + np.pi) % (2 * np.pi) - np.pi
 
-def motion_model(mu, u, dt):
-    x, y, theta = mu[0:3]
-    v, w = u
-    theta_new = wrap_angle(theta + w * dt)
-    x_new = x + v * dt * np.cos(theta)
-    y_new = y + v * dt * np.sin(theta)
-    mu[0:3] = [x_new, y_new, theta_new]
-    return mu
-
-def observation_model(mu, landmark_idx):
-    x, y, theta = mu[0:3]
-    lx, ly = mu[landmark_idx:landmark_idx+2]
-    dx = lx - x
-    dy = ly - y
-    r = np.sqrt(dx**2 + dy**2)
-    phi = wrap_angle(np.arctan2(dy, dx) - theta)
-    return np.array([r, phi])
-
-def compute_jacobians(mu, landmark_idx):
-    x, y, theta = mu[0:3]
-    lx, ly = mu[landmark_idx:landmark_idx+2]
-    dx = lx - x
-    dy = ly - y
-    q = dx**2 + dy**2
-    sqrt_q = np.sqrt(q)
-
-    H = np.zeros((2, len(mu)))
-    H[0, 0] = -dx / sqrt_q
-    H[0, 1] = -dy / sqrt_q
-    H[0, landmark_idx] = dx / sqrt_q
-    H[0, landmark_idx + 1] = dy / sqrt_q
-
-    H[1, 0] = dy / q
-    H[1, 1] = -dx / q
-    H[1, 2] = -1
-    H[1, landmark_idx] = -dy / q
-    H[1, landmark_idx + 1] = dx / q
-
-    return H
-
-def mahalanobis(z, z_pred, S):
-    dz = z - z_pred
-    dz[1] = wrap_angle(dz[1])
-    return dz.T @ np.linalg.inv(S) @ dz
-
-def ekf_slam(mu, Sigma, u, z_list, Q, R, dt, mahalanobis_thresh=5.99):
-    mu = motion_model(mu, u, dt)
-    Sigma[:3, :3] += R  # Add motion noise
-
-    for z in z_list:
-        r, phi = z
-        x, y, theta = mu[0:3]
-        lx = x + r * np.cos(theta + phi)
-        ly = y + r * np.sin(theta + phi)
-        z_new = np.array([r, phi])
-
-        matched = False
-        for i in range(3, len(mu), 2):
-            z_pred = observation_model(mu, i)
-            H = compute_jacobians(mu, i)
-            S = H @ Sigma @ H.T + Q
-            d = mahalanobis(z_new, z_pred, S)
-
-            if d < mahalanobis_thresh:
-                dz = z_new - z_pred
-                dz[1] = wrap_angle(dz[1])
-                K = Sigma @ H.T @ np.linalg.inv(S)
-                mu = mu + K @ dz
-                mu[2] = wrap_angle(mu[2])
-                Sigma = (np.eye(len(mu)) - K @ H) @ Sigma
-                matched = True
-                break
-
-        if not matched:
-            # Add new landmark
-            mu = np.append(mu, [lx, ly])
-            n = len(mu)
-            Sigma_new = np.zeros((n, n))
-            Sigma_new[:n-2, :n-2] = Sigma
-            Sigma_new[n-2:, n-2:] = np.eye(2) * 1000  # High initial uncertainty
-            Sigma = Sigma_new
-
+def initialize_ekf():
+    mu = np.zeros(3) 
+    Sigma = np.zeros((3,3)) 
     return mu, Sigma
 
-# Simulate EKF-SLAM
-np.random.seed(42)
+# Main EKF SLAM with unknown correspondences
+def ekf_slam_unknown_correspondences(mu, Sigma, u, z, R, Q, dt, alpha_threshold=5.99):
+    n_landmarks = (len(mu) - 3) // 2
+    Fx = np.hstack([np.eye(3), np.zeros((3, 2 * n_landmarks))])
 
-# Initial state
-mu = np.array([0, 0, 0])  # x, y, theta
-Sigma = np.eye(3) * 0.01
+    v, w = u
+    theta = mu[2]
+    dtheta = w * dt
+    if abs(w) > 1e-6:
+        dx = -v / w * np.sin(theta) + v / w * np.sin(theta + dtheta)
+        dy = v / w * np.cos(theta) - v / w * np.cos(theta + dtheta)
+    else:
+        dx = v * dt * np.cos(theta)
+        dy = v * dt * np.sin(theta)
 
-# Landmarks in the world
-landmarks = np.array([[5, 10], [10, 0], [15, 15]])
+    mu_bar = mu.copy()
+    mu_bar[0] += dx
+    mu_bar[1] += dy
+    mu_bar[2] = wrap_angle(mu_bar[2] + dtheta)
 
-# Noise parameters
-Q = np.diag([0.5, np.deg2rad(10)]) ** 2  # Measurement noise
-R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2  # Motion noise
+    Gx = np.array([
+        [0, 0, v/w * np.cos(theta) - v/w * np.cos(theta + dtheta)],
+        [0, 0, v/w * np.sin(theta) - v/w * np.sin(theta + dtheta)],
+        [0, 0, 0]
+    ]) if abs(w) > 1e-6 else np.array([
+        [0, 0, -v * dt * np.sin(theta)],
+        [0, 0, -v * dt * np.cos(theta)],
+        [0, 0, 0]
+    ])
 
-# Store robot path and estimated landmarks
-path = [mu[:2].copy()]
-estimated_landmarks = []
+    G = np.eye(len(mu)) + Fx.T @ Gx @ Fx
+    Sigma_bar = G @ Sigma @ G.T + Fx.T @ R @ Fx
 
-# Run for a few steps
-for t in range(10):
-    # Simulate control input
-    u = [1.0, np.deg2rad(10)]  # v, w
+    for i in range(len(z)):
+        r_i, phi_i = z[i]
+        z_i = np.array([r_i, phi_i])
+
+        min_mahalanobis = float('inf')
+        best_dz = None
+        best_H = None
+        best_K = None
+
+        Nt = (len(mu_bar) - 3) // 2
+        for j in range(Nt):
+            lm_index = 3 + 2 * j
+            delta = mu_bar[lm_index:lm_index+2] - mu_bar[0:2]
+            q = delta.T @ delta
+            sqrt_q = np.sqrt(q)
+            z_hat = np.array([
+                sqrt_q,
+                wrap_angle(np.arctan2(delta[1], delta[0]) - mu_bar[2])
+            ])
+            dz = z_i - z_hat
+            dz[1] = wrap_angle(dz[1])
+
+            Fxj = np.zeros((5, len(mu_bar)))
+            Fxj[0:3, 0:3] = np.eye(3)
+            Fxj[3, lm_index] = 1
+            Fxj[4, lm_index+1] = 1
+
+            H = (1 / q) * np.array([
+                [-sqrt_q * delta[0], -sqrt_q * delta[1], 0, sqrt_q * delta[0], sqrt_q * delta[1]],
+                [delta[1], -delta[0], -q, -delta[1], delta[0]]
+            ]) @ Fxj
+
+            S = H @ Sigma_bar @ H.T + Q
+            mahalanobis = dz.T @ np.linalg.inv(S) @ dz
+
+            if mahalanobis < min_mahalanobis:
+                min_mahalanobis = mahalanobis
+                best_dz = dz
+                best_H = H
+                best_K = Sigma_bar @ H.T @ np.linalg.inv(S)
+
+        if min_mahalanobis > alpha_threshold:
+            # New landmark
+            lx = mu_bar[0] + r_i * np.cos(phi_i + mu_bar[2])
+            ly = mu_bar[1] + r_i * np.sin(phi_i + mu_bar[2])
+            mu_bar = np.append(mu_bar, [lx, ly])
+
+            new_Sigma = np.zeros((len(mu_bar), len(mu_bar)))
+            new_Sigma[:Sigma_bar.shape[0], :Sigma_bar.shape[1]] = Sigma_bar
+            new_Sigma[-2:, -2:] = np.eye(2) * 1e2  # reduced uncertainty
+            Sigma_bar = new_Sigma
+
+            print(f"✅ New landmark added at ({lx:.2f}, {ly:.2f}) with Mahalanobis distance {min_mahalanobis:.2f}")
+        else:
+            mu_bar = mu_bar + best_K @ best_dz
+            mu_bar[2] = wrap_angle(mu_bar[2])
+            Sigma_bar = (np.eye(len(mu_bar)) - best_K @ best_H) @ Sigma_bar
+
+    return mu_bar, Sigma_bar
+
+
+def run_ekf_slam_test_unknown_correspondences():
+    mu, Sigma = initialize_ekf()
     dt = 1.0
+    R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2
+    Q = np.diag([1.0, np.deg2rad(20)]) ** 2
 
-    # Simulate observations (noisy)
-    x, y, theta = mu[0:3]
-    z_list = []
-    for lx, ly in landmarks:
-        dx = lx - x
-        dy = ly - y
-        r = np.sqrt(dx**2 + dy**2) + np.random.normal(0, np.sqrt(Q[0, 0]))
-        phi = wrap_angle(np.arctan2(dy, dx) - theta + np.random.normal(0, np.sqrt(Q[1, 1])))
-        z_list.append([r, phi])
+    landmarks = np.array([[5, 10], [10, 0], [15, 15]])
+    path = [mu[:2].copy()]
+    est_landmarks_over_time = []
 
-    mu, Sigma = ekf_slam(mu, Sigma, u, z_list, Q, R, dt)
-    path.append(mu[:2].copy())
+    for t in range(20):
+        u = [1.0, np.deg2rad(10)]
+        z = []
+        for (lx, ly) in landmarks:
+            dx = lx - mu[0]
+            dy = ly - mu[1]
+            r = np.sqrt(dx**2 + dy**2) + np.random.normal(0, np.sqrt(Q[0, 0]))
+            phi = wrap_angle(np.arctan2(dy, dx) - mu[2] + np.random.normal(0, np.sqrt(Q[1, 1])))
+            z.append([r, phi])
 
-# Plot results
-path = np.array(path)
-est_landmarks = np.array(mu[3:]).reshape(-1, 2)
+        mu, Sigma = ekf_slam_unknown_correspondences(mu, Sigma, u, z, R, Q, dt)
+        path.append(mu[:2].copy())
+        est_landmarks = np.array(mu[3:]).reshape(-1, 2)
+        est_landmarks_over_time.append(est_landmarks)
 
-plt.figure(figsize=(8, 6))
-plt.plot(path[:, 0], path[:, 1], 'b-o', label='Estimated Path')
-plt.scatter(landmarks[:, 0], landmarks[:, 1], c='g', marker='^', label='True Landmarks')
-plt.scatter(est_landmarks[:, 0], est_landmarks[:, 1], c='r', marker='x', label='Estimated Landmarks')
-plt.legend()
-plt.title('EKF-SLAM without Correspondence (Mahalanobis Thresholding)')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.grid(True)
-plt.axis('equal')
-plt.show()
+    path = np.array(path)
+    final_landmarks = est_landmarks_over_time[-1]
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(path[:, 0], path[:, 1], 'b-o', label='Estimated Path')
+    plt.scatter(landmarks[:, 0], landmarks[:, 1], c='g', marker='^', label='True Landmarks')
+    if len(final_landmarks) > 0:
+        plt.scatter(final_landmarks[:, 0], final_landmarks[:, 1], c='r', marker='x', label='Estimated Landmarks')
+    plt.legend()
+    plt.title('EKF-SLAM with Unknown Correspondences')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.grid(True)
+    plt.axis('equal')
+    plt.show()
+
+run_ekf_slam_test_unknown_correspondences()
