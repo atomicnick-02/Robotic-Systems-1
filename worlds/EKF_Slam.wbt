@@ -9,8 +9,8 @@ WorldInfo {
   basicTimeStep 10
 }
 Viewpoint {
-  orientation -0.06642429463218301 -0.8813228332476515 0.4678224841528558 5.9637615781433375
-  position -0.5548308687756032 0.06879584493138773 0.45765355607660724
+  orientation -0.06244357190076222 -0.8877053319465228 0.45615791559720653 5.977227246341113
+  position -1.1091401939836003 0.045975803175094504 0.9787163887205251
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -33,10 +33,8 @@ Robot {
       name "cal_ds"
       lookupTable [
         0 0 0.01
-        1 200 0.001
         2.5 250 0.001
       ]
-      type "infra-red"
     }
     Camera {
       translation 0 0 0.3
@@ -59,13 +57,13 @@ Robot {
       recognitionColors [
         0 0 0
       ]
-      fieldOfView 1
-      width 256
-      height 256
+      fieldOfView 1.2
+      width 512
+      height 512
       far 6
       antiAliasing TRUE
       focus Focus {
-        focalLength 100
+        focalLength 0.35
       }
     }
     Group {
@@ -136,7 +134,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16029999999999964 0.0825
+        translation 0 0.16029999999999958 0.0825
         rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
         children [
           DEF WHEEL Pose {
@@ -176,7 +174,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080519 -0.6576489613697534 -0.367417656966087 2.43737974683996
+        rotation 0.6576489253080519 -0.6576489613697534 -0.3674176569660871 2.43737974683996
         children [
           USE WHEEL
         ]
@@ -595,6 +593,74 @@ Group {
   children [
     DEF pic0 Transform {
       translation 2.5 0 0.3
+      rotation 0 0 1 3.14154
+      scale 0.0001 0.6 0.6
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_0.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic0 Transform {
+      translation 2.5 -0.6 0.3
       rotation 0 0 1 3.14154
       scale 0.0001 0.6 0.6
       children [

@@ -47,9 +47,8 @@ def initialize(robot):
         num_sensors = 16
         sensor_prefix = "ds"
         weights = pioneer2_matrix
-        calibration_sensor = 1
         cal_sesnor_prefix = "cal_ds"
-        max_speed = 10.0
+        max_speed = 5.0
         speed_unit = 0.3
     else:
         print("This controller doesn't support robot:", robot_name)
