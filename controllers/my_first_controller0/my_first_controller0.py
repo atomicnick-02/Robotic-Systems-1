@@ -14,7 +14,7 @@ def bound(x, a, b):
 	return a if x < a else b if x > b else x
 
 
-def initialize(robot):
+def initialize(robot) -> dict:
 	"""
 	Initialize devices, sensors, motors, and Braitenberg weights.
 	Returns a dict with all handles and parameters.

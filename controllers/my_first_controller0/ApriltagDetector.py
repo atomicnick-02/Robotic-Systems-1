@@ -34,7 +34,7 @@ class AprilTagDetector:
 		# Storage for detected AprilTags
 		self.april_tags = {}
 
-	def detect(self, image):
+	def detect(self, image) -> dict:
 		"""
 		Detect AprilTags in the given image and estimate their poses.
 
