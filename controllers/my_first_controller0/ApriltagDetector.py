@@ -33,31 +33,27 @@ class AprilTagDetector:
 		gray = cv2.cvtColor(rgb, cv2.COLOR_BGRA2GRAY)
 
 		# Set camera parameters
-		self.focal_length = 205  
+		self.focal_length = 205  # NOTE -This is a function of FOV and image size
 		fx, fy = self.focal_length, self.focal_length
 		cx, cy = self.width / 2, self.height / 2
 		camera_params = [fx, fy, cx, cy]
 		tag_locs = {}  # Key is tag ID, value is an array of pose matrices
-		# Detect AprilTags
 		result = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_params, tag_size=0.6)
 		
 		# Process multiple detected tags
 		if len(result) > 0:
 			for r in result:
-				# Rotate the result by 90 degrees
-				# r.pose_R = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ r.pose_R
 				r.pose_t = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ r.pose_t
 				if r.tag_id not in tag_locs:
-						
 					tag_locs[r.tag_id] = [r.pose_t.flatten()]
 				else:
 					tag_locs[r.tag_id].append(r.pose_t.flatten())
-				# print(f"Tag ID: {r.tag_id}, Pose: {r.pose_t.T}")
 		else:
 			return
 		# average the tags based on their id
 		for tag_id, poses in tag_locs.items():
 			print(f"Tag ID: {tag_id}, Poses: {poses}")
 		print("_" * 20)
+		#TODO - Use the Likelihood Ratio Test to determine if two tags are the same
 		# print the tags
 		return self.AprilTags
