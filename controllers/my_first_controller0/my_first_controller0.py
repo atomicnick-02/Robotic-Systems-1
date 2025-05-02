@@ -82,7 +82,7 @@ def initialize(robot) -> dict:
 
 	print(f"Initialized {robot_name} with {num_sensors} sensors.")
 	# Initialize odometry
-	odometry = Odometry(robot)
+	# odometry = Odometry(robot)
 	print("Odometry initialized.")
 	return {
 		'time_step': time_step,

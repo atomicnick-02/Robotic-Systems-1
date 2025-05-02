@@ -10,4 +10,4 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: DistanceSensorRays
 consoles: Console:All:All
-renderingDevicePerspectives: Pioneer 2:camera;1;0.449488;0.697737;0.10063
+renderingDevicePerspectives: Pioneer 2:camera;0;0.839844;0;0
