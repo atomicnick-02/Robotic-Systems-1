@@ -1,4 +1,5 @@
-from controller import Robot
+from controller import Robot, Supervisor
+from source.Odometry import Odometry
 import numpy as np
 
 from source.ApriltagDetector import AprilTagDetector
@@ -79,9 +80,10 @@ def initialize(robot) -> dict:
 		cam.enable(time_step)
 		print(f"Camera enabled with FOV: {cam.getFov()} rad")
 
-
 	print(f"Initialized {robot_name} with {num_sensors} sensors.")
-
+	# Initialize odometry
+	odometry = Odometry(robot)
+	print("Odometry initialized.")
 	return {
 		'time_step': time_step,
 		'sensors': sensors,

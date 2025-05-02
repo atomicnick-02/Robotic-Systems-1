@@ -1,6 +1,6 @@
 from controller import Robot
 import numpy as np
-
+from controller import Supervisor, Robot
 
 class Odometry:
 	def __init__(self, robot: Robot):
@@ -20,5 +20,8 @@ class Odometry:
 		# Initialize encoders
 		self.left_encoder.enable(self.time_step)
 		self.right_encoder.enable(self.time_step)
-		# Initialize wheel radius and distance between wheels
-		self.wheel_radius = 
+		# Init the robot's supervisor
+		self.supervisor = Supervisor()
+		self.robot_node = self.supervisor.getFromDef("Pioneer 2")
+		print(self.robot_node)
+		
