@@ -45,7 +45,7 @@ def initialize(robot) -> dict:
 		sensor_prefix = "ds"
 		weights = pioneer2_matrix
 		cal_sesnor_prefix = "cal_ds"
-		max_speed = 5.0
+		max_speed = 5.0 # Angular speed
 		speed_unit = 0.3
 	else:
 		print("This controller doesn't support robot:", robot_name)
@@ -130,12 +130,9 @@ def run():
 		# Read encoders
 		odometry.update_last_encoder_values()
 		# print(f"Read encoders: {odometry.read_encoders()}")
-		# Print current and previous encoder values
-		print(f"Previous encoder values: {odometry.enc_tp}", end=" ")
-		print(f"Current encoder values: {odometry.enc_tc}")
-		print(f"Distance: {odometry.calculate_distance()}")
-		# print(f"Left wheel speed: {ctx['left_motor'].getVelocity()} , Right wheel speed: {ctx['right_motor'].getVelocity()}")
-		# print(f"Encoder meausement:")
+
+		print(f"Encoder meausement:{odometry.calculate_angular_vel()}")
+		
 		readings = [ds.getValue() for ds in ctx['sensors']]
 		# print the value of ds0
 		# if a sensor readind is detected that is not 0, print it
@@ -145,10 +142,10 @@ def run():
 		speed_r = 0.0
 		for i, val in enumerate(readings):
 			factor = 1.0 - (val / ctx['range'])
-			# speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
-			# speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
-			speed_l += 0.5
-			speed_r += 0.5
+			speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
+			speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
+			# speed_l += 0.5
+			# speed_r += 0.5
 		# Clamp
 		speed_l = bound(speed_l, -ctx['max_speed'], ctx['max_speed'])
 		speed_r = bound(speed_r, -ctx['max_speed'], ctx['max_speed'])
@@ -156,6 +153,7 @@ def run():
 		# Set velocities
 		ctx['left_motor'].setVelocity(speed_l)
 		ctx['right_motor'].setVelocity(speed_r)
+		print(f"Left wheel speed: {ctx['left_motor'].getVelocity()} , Right wheel speed: {ctx['right_motor'].getVelocity()}")
 
 		#SECTION - After Actions
 		# Update the last encoder values

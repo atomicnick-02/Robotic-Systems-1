@@ -33,7 +33,7 @@ class Odometry:
 		"""
 		Update the last encoder values with the current values.
 		"""
-		# self.enc_tp = self.enc_tc
+		self.enc_tp = self.enc_tc
 		self.enc_tc = self.read_encoders() 
 	
 	def read_encoders(self) -> tuple:
@@ -72,11 +72,11 @@ class Odometry:
 		"""
 		l_enc_diff = self.enc_tc[0] - self.enc_tp[0]
 		r_enc_diff = self.enc_tc[1] - self.enc_tp[1]
-		left_distance = l_enc_diff * self.wheel_radius
-		right_distance = r_enc_diff * self.wheel_radius
+		left_distance = l_enc_diff 
+		right_distance = r_enc_diff 
 		
-		left_angular_velocity = left_distance / self.dt
-		right_angular_velocity = right_distance / self.dt
+		left_angular_velocity = round(left_distance / self.dt * 1000, 3) 
+		right_angular_velocity = round(right_distance / self.dt *1000,3)
 		
 		return left_angular_velocity, right_angular_velocity
 	def calculate_linear_vel(self) -> tuple:
@@ -90,6 +90,6 @@ class Odometry:
 		
 		left_speed = left_distance / self.dt
 		right_speed = right_distance / self.dt
-		
-		return left_speed, right_speed
+		speed = (left_speed + right_speed) / 2
+		return round(speed, 3)
 
