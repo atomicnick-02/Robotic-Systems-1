@@ -95,6 +95,9 @@ Robot {
           width 1280
           height 720
           far 1
+          focus Focus {
+            focalLength 0.00304
+          }
         }
       ]
       name "camera"
@@ -213,7 +216,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6879677669702222 -0.6879677669702209 -0.23108592172612827 2.6873939999999994
+        rotation 0.6879677669702222 -0.6879677669702208 -0.23108592172612824 2.6873939999999994
         children [
           USE WHEEL
         ]

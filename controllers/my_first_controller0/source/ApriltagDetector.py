@@ -52,10 +52,13 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		# self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 62.2, 48.8 
+		print("tan pi/3:", np.tan(np.pi/3))
+		pixel_size = 2*np.tan((self.camera.getFov()*180/np.pi) / 2) / self.width
+		fx, fy = self.focal_length / pixel_size, self.focal_length / pixel_size
 		cx, cy = self.width / 2, self.height / 2
 		camera_params = [fx, fy, cx, cy] 
-		
+		print(f"focal length: {self.focal_length} pixel size: {pixel_size}")
+		print("camera_params:", camera_params)
 		# Store detected tag locations
 		tag_locations = {}
 
