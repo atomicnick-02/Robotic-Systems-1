@@ -51,10 +51,10 @@ class AprilTagDetector:
 		gray_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
 
 		# Define camera calibration parameters
-		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = self.focal_length, self.focal_length
+		# self.focal_length = 205  # Calculated based on FOV and image size
+		fx, fy = 62.2, 48.8 
 		cx, cy = self.width / 2, self.height / 2
-		camera_params = [fx, fy, cx, cy]
+		camera_params = [fx, fy, cx, cy] 
 		
 		# Store detected tag locations
 		tag_locations = {}

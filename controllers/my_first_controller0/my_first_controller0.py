@@ -123,6 +123,7 @@ def run():
 		# SECTION - Measurements	
 		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
 		res = ctx['AprilTagDetector'].detect(image)
+		print(res)
 		odometry.update_last_encoder_values() # Read encoders
 		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
 		# !SECTION - Measurements

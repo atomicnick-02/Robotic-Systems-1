@@ -46,7 +46,6 @@ class Odometry:
 		l_encoder_value = self.l_encoder.getValue()
 		r_encoder_value = self.r_encoder.getValue()
 		
-		
 		return l_encoder_value, r_encoder_value
 	
 	def calculate_distance(self) -> tuple:
