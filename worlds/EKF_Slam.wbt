@@ -96,7 +96,7 @@ Robot {
           height 720
           far 1
           focus Focus {
-            focalLength 0.00304
+            focalLength 37
           }
         }
       ]
