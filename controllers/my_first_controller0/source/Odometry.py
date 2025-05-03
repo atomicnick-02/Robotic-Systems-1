@@ -75,8 +75,8 @@ class Odometry:
 		left_distance = l_enc_diff 
 		right_distance = r_enc_diff 
 		
-		left_angular_velocity = round(left_distance / self.dt * 1000, 3) 
-		right_angular_velocity = round(right_distance / self.dt *1000,3)
+		left_angular_velocity = round(left_distance / self.dt * 1000, 4) # I am dealing with milliseconds
+		right_angular_velocity = round(right_distance / self.dt *1000, 4)
 		
 		return left_angular_velocity, right_angular_velocity
 	def calculate_linear_vel(self) -> tuple:

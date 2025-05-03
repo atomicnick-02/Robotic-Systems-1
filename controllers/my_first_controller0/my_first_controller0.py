@@ -45,8 +45,8 @@ def initialize(robot) -> dict:
 		sensor_prefix = "ds"
 		weights = pioneer2_matrix
 		cal_sesnor_prefix = "cal_ds"
-		max_speed = 5.0 # Angular speed
-		speed_unit = 0.3
+		max_speed = 10.0 # Angular speed
+		speed_unit = 0.9
 	else:
 		print("This controller doesn't support robot:", robot_name)
 		exit(1)
@@ -105,7 +105,7 @@ def run():
 	robot = Robot()
 	ctx = initialize(robot)
 	# Initialize odometry
-	odometry = Odometry(robot, ctx)
+	odometry = Odometry(robot)
 	odometry.update_last_encoder_values() # Create the zero point
 	print("Timestep:", ctx['time_step'])
 	# np.set_printoptions(suppress = True, precision = 4)
@@ -119,32 +119,22 @@ def run():
 		
 	print("Starting main loop...")
 	while robot.step(ctx['time_step']) != -1:
-		# Refresh camera image
-	
-		# Detect AprilTags
-		if ctx['camera']:
-			# Get the image from the camera
-			image = ctx['camera'].getImage()
-			res = ctx['AprilTagDetector'].detect(image)
-			
-		# Read encoders
-		odometry.update_last_encoder_values()
-		# print(f"Read encoders: {odometry.read_encoders()}")
-
-		print(f"Encoder meausement:{odometry.calculate_angular_vel()}")
 		
-		readings = [ds.getValue() for ds in ctx['sensors']]
-		# print the value of ds0
-		# if a sensor readind is detected that is not 0, print it
+		# SECTION - Measurements	
+		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
+		res = ctx['AprilTagDetector'].detect(image)
+		odometry.update_last_encoder_values() # Read encoders
+		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
+		# !SECTION - Measurements
 
-		# Braitenberg: compute wheel speeds
+		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0
 		for i, val in enumerate(readings):
 			factor = 1.0 - (val / ctx['range'])
 			speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
 			speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
-			# speed_l += 0.5
+			# speed_l -= 0.5
 			# speed_r += 0.5
 		# Clamp
 		speed_l = bound(speed_l, -ctx['max_speed'], ctx['max_speed'])
@@ -153,9 +143,10 @@ def run():
 		# Set velocities
 		ctx['left_motor'].setVelocity(speed_l)
 		ctx['right_motor'].setVelocity(speed_r)
-		print(f"Left wheel speed: {ctx['left_motor'].getVelocity()} , Right wheel speed: {ctx['right_motor'].getVelocity()}")
+		# !SECTION - Motor Actions
 
-		#SECTION - After Actions
+		
+		# SECTION - After Actions
 		# Update the last encoder values
 
 
