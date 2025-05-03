@@ -101,14 +101,19 @@ def initialize(robot) -> dict:
 def run():
 	robot = Robot()
 	ctx = initialize(robot)
+	# Initialize odometry
+	odometry = Odometry(robot)
+
+	print("Timestep:", ctx['time_step'])
+
 	# Initialize AprilTag detector
 	if ctx['camera']:
 		print("focal length:", ctx['camera'].getFocalLength())
 		ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
 		print("AprilTag detector initialized.")
 	# cal_ds = ctx['cal_ds']
-	
-	res = None
+
+		
 	
 	while robot.step(ctx['time_step']) != -1:
 		# Refresh camera image
@@ -119,8 +124,11 @@ def run():
 			image = ctx['camera'].getImage()
 			res = ctx['AprilTagDetector'].detect(image)
 			
-		#read the calibration sensor
-		cal_ds_value = ctx['cal_ds'].getValue()
+		# Read odometry
+		left_encoder, right_encoder = odometry.read_encoders()
+		print("Left encoder:", left_encoder)
+		print("Right encoder:", right_encoder)
+
 
 		readings = [ds.getValue() for ds in ctx['sensors']]
 		# print the value of ds0

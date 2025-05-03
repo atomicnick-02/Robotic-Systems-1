@@ -134,7 +134,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16029999999999953 0.0825
+        translation 0 0.16029999999999947 0.0825
         rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
         children [
           DEF WHEEL Pose {
@@ -174,7 +174,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080517 -0.6576489613697534 -0.36741765696608714 2.43737974683996
+        rotation 0.6576489253080516 -0.6576489613697534 -0.3674176569660872 2.43737974683996
         children [
           USE WHEEL
         ]
@@ -524,6 +524,7 @@ Robot {
     ]
   }
   controller "my_first_controller0"
+  supervisor TRUE
 }
 Group {
   children [

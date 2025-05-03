@@ -1,6 +1,6 @@
 from controller import Robot
 import numpy as np
-from controller import Supervisor, Robot
+
 
 class Odometry:
 	def __init__(self, robot: Robot):
@@ -20,8 +20,37 @@ class Odometry:
 		# Initialize encoders
 		self.left_encoder.enable(self.time_step)
 		self.right_encoder.enable(self.time_step)
-		# Init the robot's supervisor
-		self.supervisor = Supervisor()
-		self.robot_node = self.supervisor.getFromDef("Pioneer 2")
-		print(self.robot_node)
+		# Init the robot's wheel radius and distance between wheels
+		self.wheel_radius = 0.0825  # in meters
+		self.wheel_distance = 0.331
+		# The last encoder values
+		self.last_left_encoder_value = 0.0
+		self.last_right_encoder_value = 0.0
 		
+	def read_encoders(self) -> tuple:
+		"""
+		Read the encoder values for the left and right wheels.
+
+		Returns:
+			A tuple containing the left and right encoder values.
+		"""
+		left_encoder_value = round(self.left_encoder.getValue(), 2)
+		right_encoder_value = round(self.right_encoder.getValue(),2)
+		
+		
+		return left_encoder_value, right_encoder_value
+	
+	def calculate_distance(self) -> tuple:
+		"""
+		Calculate the distance traveled by the left and right wheels
+		since the last encoder reading.
+
+		Returns:
+			A tuple containing the distance traveled by the left and right wheels.
+		"""
+		left_encoder_value, right_encoder_value = self.read_encoders()
+		
+		left_distance = (left_encoder_value - self.last_left_encoder_value) * self.wheel_radius
+		right_distance = (right_encoder_value - self.last_right_encoder_value) * self.wheel_radius
+		
+		return left_distance, right_distance
