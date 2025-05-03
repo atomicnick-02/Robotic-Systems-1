@@ -1,10 +1,9 @@
-from controller import Robot, Supervisor
+from controller import Robot, Supervisor, PositionSensor
 from source.Odometry import Odometry
 import numpy as np
 
 from source.ApriltagDetector import AprilTagDetector
-np.set_printoptions(suppress = True, precision = 4)
-
+np.set_printoptions(suppress=True, precision=4)
 # Constants
 MAX_SENSOR_NUMBER = 16
 RANGE = 1024 / 2
@@ -12,7 +11,6 @@ RANGE = 1024 / 2
 # Helper to clamp values
 def bound(x, a, b):
 	return a if x < a else b if x > b else x
-
 
 def initialize(robot) -> dict:
 	"""
@@ -72,6 +70,12 @@ def initialize(robot) -> dict:
 	right_motor.setPosition(float('inf'))
 	left_motor.setVelocity(0.0)
 	right_motor.setVelocity(0.0)
+	# Initialize encoders
+	left_encoder = robot.getDevice("left wheel sensor")
+	right_encoder = robot.getDevice("right wheel sensor")
+	left_encoder.enable(time_step)
+	right_encoder.enable(time_step)
+
 
 	# Initialize camera if present
 	cam = None
@@ -80,10 +84,7 @@ def initialize(robot) -> dict:
 		cam.enable(time_step)
 		print(f"Camera enabled with FOV: {cam.getFov()} rad")
 
-	print(f"Initialized {robot_name} with {num_sensors} sensors.")
-	# Initialize odometry
-	# odometry = Odometry(robot)
-	print("Odometry initialized.")
+
 	return {
 		'time_step': time_step,
 		'sensors': sensors,
@@ -93,6 +94,8 @@ def initialize(robot) -> dict:
 		'speed_unit': speed_unit,
 		'left_motor': left_motor,
 		'right_motor': right_motor,
+		'left_encoder': left_encoder,
+		'right_encoder': right_encoder,
 		'camera': cam,
 		'cal_ds': cal_ds,
 	}
@@ -102,19 +105,19 @@ def run():
 	robot = Robot()
 	ctx = initialize(robot)
 	# Initialize odometry
-	odometry = Odometry(robot)
-
+	odometry = Odometry(robot, ctx)
+	odometry.update_last_encoder_values() # Create the zero point
 	print("Timestep:", ctx['time_step'])
-
+	# np.set_printoptions(suppress = True, precision = 4)
+	
 	# Initialize AprilTag detector
 	if ctx['camera']:
 		print("focal length:", ctx['camera'].getFocalLength())
 		ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
 		print("AprilTag detector initialized.")
-	# cal_ds = ctx['cal_ds']
 
 		
-	
+	print("Starting main loop...")
 	while robot.step(ctx['time_step']) != -1:
 		# Refresh camera image
 	
@@ -124,12 +127,15 @@ def run():
 			image = ctx['camera'].getImage()
 			res = ctx['AprilTagDetector'].detect(image)
 			
-		# Read odometry
-		left_encoder, right_encoder = odometry.read_encoders()
-		print("Left encoder:", left_encoder)
-		print("Right encoder:", right_encoder)
-
-
+		# Read encoders
+		odometry.update_last_encoder_values()
+		# print(f"Read encoders: {odometry.read_encoders()}")
+		# Print current and previous encoder values
+		print(f"Previous encoder values: {odometry.enc_tp}", end=" ")
+		print(f"Current encoder values: {odometry.enc_tc}")
+		print(f"Distance: {odometry.calculate_distance()}")
+		# print(f"Left wheel speed: {ctx['left_motor'].getVelocity()} , Right wheel speed: {ctx['right_motor'].getVelocity()}")
+		# print(f"Encoder meausement:")
 		readings = [ds.getValue() for ds in ctx['sensors']]
 		# print the value of ds0
 		# if a sensor readind is detected that is not 0, print it
@@ -150,7 +156,10 @@ def run():
 		# Set velocities
 		ctx['left_motor'].setVelocity(speed_l)
 		ctx['right_motor'].setVelocity(speed_r)
-		
+
+		#SECTION - After Actions
+		# Update the last encoder values
+
 
 
 if __name__ == "__main__":

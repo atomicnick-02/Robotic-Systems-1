@@ -9,8 +9,8 @@ WorldInfo {
   basicTimeStep 10
 }
 Viewpoint {
-  orientation 0.004770643098465993 -0.9994214363082105 -0.03367541554399167 6.000975019442033
-  position -4.5654281531363425 -0.9722883995484101 1.806758435962351
+  orientation 0.00977468988172343 -0.9995196565459291 -0.029409379728655143 5.640848352794588
+  position -5.539935101840571 -1.0469305417444257 5.129659864714163
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -121,7 +121,6 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 4262.606556379075
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -134,8 +133,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.16029999999999947 0.0825
-        rotation -0.6529171699639255 0.6529173622898778 -0.38392458528560885 2.4084487302154756
+        translation 0 0.16029999999999944 0.0825
+        rotation 0.252683970113426 -0.2526839701134259 -0.9339708895331987 1.6390530000000008
         children [
           DEF WHEEL Pose {
             rotation 0.577656895078166 0.5771968951617173 -0.5771968951617173 -2.093935
@@ -160,7 +159,6 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3468.6891496484436
         axis 0 1 0
         anchor 0 0 0.0825
       }
@@ -174,7 +172,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6576489253080516 -0.6576489613697534 -0.3674176569660872 2.43737974683996
+        rotation 0.6879677669702222 -0.6879677669702209 -0.23108592172612827 2.6873939999999994
         children [
           USE WHEEL
         ]

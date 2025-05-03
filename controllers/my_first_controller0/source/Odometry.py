@@ -1,9 +1,9 @@
-from controller import Robot
+from controller import Robot, PositionSensor
 import numpy as np
 
 
 class Odometry:
-	def __init__(self, robot: Robot):
+	def __init__(self, robot: Robot, ctx: dict = None):
 		"""
 		Initialize the Odometry class with a robot instance.
 		This class is only responsible for odometry calculations
@@ -14,31 +14,40 @@ class Odometry:
 		"""
 		self.robot = robot
 		# Initialize robot parameters
-		self.time_step = int(robot.getBasicTimeStep())
-		self.left_encoder = robot.getDevice("left wheel sensor")
-		self.right_encoder = robot.getDevice("right wheel sensor")
+		self.dt = int(robot.getBasicTimeStep())
+		self.l_encoder = ctx['left_encoder'] if ctx else robot.getDevice("left wheel sensor")
+		self.r_encoder = ctx['right_encoder'] if ctx else robot.getDevice("right wheel sensor")
+
 		# Initialize encoders
-		self.left_encoder.enable(self.time_step)
-		self.right_encoder.enable(self.time_step)
+		self.l_encoder.enable(self.dt)
+		self.r_encoder.enable(self.dt)
 		# Init the robot's wheel radius and distance between wheels
 		self.wheel_radius = 0.0825  # in meters
 		self.wheel_distance = 0.331
 		# The last encoder values
-		self.last_left_encoder_value = 0.0
-		self.last_right_encoder_value = 0.0
-		
+		self.enc_tp = (0, 0) # Left and right encoder values past
+		self.enc_tc = (0, 0) # Left and right encoder values current
+
+
+	def update_last_encoder_values(self):
+		"""
+		Update the last encoder values with the current values.
+		"""
+		# self.enc_tp = self.enc_tc
+		self.enc_tc = self.read_encoders() 
+	
 	def read_encoders(self) -> tuple:
 		"""
-		Read the encoder values for the left and right wheels.
+		Read the current values of the left and right encoders.
 
 		Returns:
 			A tuple containing the left and right encoder values.
 		"""
-		left_encoder_value = round(self.left_encoder.getValue(), 2)
-		right_encoder_value = round(self.right_encoder.getValue(),2)
+		l_encoder_value = self.l_encoder.getValue()
+		r_encoder_value = self.r_encoder.getValue()
 		
 		
-		return left_encoder_value, right_encoder_value
+		return l_encoder_value, r_encoder_value
 	
 	def calculate_distance(self) -> tuple:
 		"""
@@ -48,9 +57,39 @@ class Odometry:
 		Returns:
 			A tuple containing the distance traveled by the left and right wheels.
 		"""
-		left_encoder_value, right_encoder_value = self.read_encoders()
+		l_encoder_value, r_encoder_value = self.read_encoders()
 		
-		left_distance = (left_encoder_value - self.last_left_encoder_value) * self.wheel_radius
-		right_distance = (right_encoder_value - self.last_right_encoder_value) * self.wheel_radius
-		
+		left_distance = (l_encoder_value - self.enc_tp[0]) * self.wheel_radius
+		right_distance = (r_encoder_value - self.enc_tp[1]) * self.wheel_radius
+
 		return left_distance, right_distance
+	def calculate_angular_vel(self) -> tuple:
+		"""
+		Calculate the angular velocity of the robot based on the wheel speeds.
+
+		Returns:
+			A tuple containing the left and right angular velocities.
+		"""
+		l_enc_diff = self.enc_tc[0] - self.enc_tp[0]
+		r_enc_diff = self.enc_tc[1] - self.enc_tp[1]
+		left_distance = l_enc_diff * self.wheel_radius
+		right_distance = r_enc_diff * self.wheel_radius
+		
+		left_angular_velocity = left_distance / self.dt
+		right_angular_velocity = right_distance / self.dt
+		
+		return left_angular_velocity, right_angular_velocity
+	def calculate_linear_vel(self) -> tuple:
+		"""
+		Calculate the wheel speeds based on the encoder values.
+
+		Returns:
+			A tuple containing the left and right wheel speeds.
+		"""
+		left_distance, right_distance = self.calculate_distance()
+		
+		left_speed = left_distance / self.dt
+		right_speed = right_distance / self.dt
+		
+		return left_speed, right_speed
+

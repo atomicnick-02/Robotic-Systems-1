@@ -86,8 +86,8 @@ class AprilTagDetector:
 				tag_locations[detection.tag_id].append(detection.pose_t.flatten())
 
 		# Debug output for detected tags
-		for tag_id, poses in tag_locations.items():
-			print(f"Tag ID: {tag_id}, Poses: {poses}")
-		print("_" * 20)
+		# for tag_id, poses in tag_locations.items():
+		# 	print(f"Tag ID: {tag_id}, Poses: {poses}")
+		# print("_" * 20)
 
 		return tag_locations
