@@ -1,8 +1,7 @@
-
 import numpy as np
 import cv2 as cv
 import glob
-
+np.set_printoptions(suppress=True, precision=4)
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 25, 0.001)
 
@@ -40,6 +39,11 @@ if ret == True:
     cx = mtx[0][2]
     cy = mtx[1][2]
     print(f"fx: {fx}, fy: {fy}, cx: {cx}, cy: {cy}")
+    print("mtx: ", mtx)
+    print("dist: ", dist)
+    print("rvecs: ", rvecs)
+    print("tvecs: ", tvecs)
+    print("dist: ", dist)
 cv.destroyAllWindows()
 
 # import numpy as np

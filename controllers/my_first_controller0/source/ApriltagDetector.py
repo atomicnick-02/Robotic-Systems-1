@@ -52,10 +52,10 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 290.65, 581.778
-		cx, cy = 1294.43, 746.4
+		fx, fy = 874.5497056724861, 876.8411106683374
+		cx, cy = 1279.315, 722.6236
 		camera_params = [fx, fy, cx, cy]
-		
+		distortion = [[-0.4856, -20.664, -0.0049, -0.0007, 276.5148]]
 		# Store detected tag locations
 		tag_locations = {}
 
@@ -64,7 +64,8 @@ class AprilTagDetector:
 			gray_image,
 			estimate_tag_pose=True,
 			camera_params=camera_params,
-			tag_size=0.6
+			tag_size=0.6,
+
 		)
 		
 		# Process detected tags
