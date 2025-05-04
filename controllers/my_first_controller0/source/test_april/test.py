@@ -1,247 +1,110 @@
-#!/usr/bin/env python3
 import cv2
 import numpy as np
 import argparse
-import pupil_apriltags as apriltag
-import glob
-from pathlib import Path
+from collections import defaultdict
 
-def detect_apriltags(image_path):
-    """
-    Detect AprilTags in the given image
-    
-    Args:
-        image_path: Path to the image file
-        
-    Returns:
-        detections: List of AprilTag detections
-        image: The loaded image
-    """
-    # Load the image
-    image = cv2.imread(image_path)
-    if image is None:
-        raise ValueError(f"Failed to load image from {image_path}")
-    
-    # Convert to grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Create detector (36h11 family)
-    detector = apriltag.Detector(families='tag36h11',
-                                nthreads=4,
-                                quad_decimate=1.0,
-                                quad_sigma=0.0,
-                                refine_edges=1,
-                                decode_sharpening=0.25,
-                                debug=0)
-    
-    # Detect AprilTags
-    detections = detector.detect(gray)
-    print(f"Detected {len(detections)} tags in {image_path}")
-    
-    return detections, image
+# Optional: pip install pupil_apriltags or apriltag
+try:
+    from pupil_apriltags import Detector
+except ImportError:
+    from apriltag import ApriltagDetector as Detector
 
-def draw_detections(image, detections):
-    """Draw the detected AprilTags on the image"""
-    # Make a copy of the image to draw on
-    result = image.copy()
-    
+
+def detect_apriltags(img_gray, tag_family="36h11", nthreads=4):
+    """
+    Detect AprilTags in a grayscale image.
+    Returns a list of detections, each with tag_id and corner pixel points.
+    """
+    detector = Detector(families=tag_family, nthreads=nthreads)
+    detections = detector.detect(img_gray)
+    results = []
     for det in detections:
-        # Extract corners and convert to integers
-        corners = np.array(det.corners, dtype=np.int32).reshape((-1, 1, 2))
-        
-        # Draw the tag outline
-        cv2.polylines(result, [corners], True, (0, 255, 0), 2)
-        
-        # Draw the tag center
-        center = tuple(np.mean(corners, axis=0)[0].astype(int))
-        cv2.circle(result, center, 5, (0, 0, 255), -1)
-        
-        # Print tag ID
-        cv2.putText(result, str(det.tag_id), 
-                    (center[0] - 10, center[1] - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-    
-    return result
+        corners = np.array(det.corners, dtype=np.float32)
+        results.append({
+            'id': det.tag_id,
+            'corners': corners
+        })
+    return results
 
-def create_apriltag_board_points(tag_size=0.08, tag_spacing=0.02, rows=6, cols=6):
+
+def build_object_points(detections, tag_size, tag_positions):
     """
-    Create the 3D points for an AprilGrid calibration board
-    
-    Args:
-        tag_size: Size of each tag in meters (default 8cm)
-        tag_spacing: Spacing between tags in meters (default 2cm)
-        rows: Number of tag rows (default 6)
-        cols: Number of tag columns (default 6)
-        
-    Returns:
-        board_points: Dictionary mapping tag IDs to their 3D coordinates
+    Given list of detections and known 3D center positions of each tag,
+    build object_points and image_points lists for calibration.
+
+    tag_size: side length of tag (float, in meters).
+    tag_positions: dict mapping tag_id to (x, y, z) center in world coords.
     """
-    board_points = {}
-    
-    for row in range(rows):
-        for col in range(cols):
-            tag_id = row * cols + col
-            
-            # Calculate the tag position in the grid
-            # Bottom-left corner of the tag
-            x0 = col * (tag_size + tag_spacing)
-            y0 = row * (tag_size + tag_spacing)
-            
-            # All four corners of the tag
-            corners = [
-                [x0, y0, 0],                      # Bottom-left
-                [x0 + tag_size, y0, 0],           # Bottom-right
-                [x0 + tag_size, y0 + tag_size, 0], # Top-right
-                [x0, y0 + tag_size, 0]            # Top-left
-            ]
-            
-            board_points[tag_id] = np.array(corners)
-            
-    return board_points
+    obj_pts = []
+    img_pts = []
 
-def calibrate_camera_from_apriltags(image_paths, tag_size=0.08, tag_spacing=0.02, rows=6, cols=6):
-    """
-    Calibrate camera using AprilTag grid
-    
-    Args:
-        image_paths: List of paths to calibration images
-        tag_size: Size of each tag in meters (default 8cm)
-        tag_spacing: Spacing between tags in meters (default 2cm)
-        rows: Number of tag rows (default 6)
-        cols: Number of tag columns (default 6)
-        
-    Returns:
-        ret: RMS reprojection error
-        mtx: Camera matrix (intrinsic parameters)
-        dist: Distortion coefficients
-        rvecs: Rotation vectors
-        tvecs: Translation vectors
-    """
-    # Create 3D points for the AprilGrid
-    board_points = create_apriltag_board_points(tag_size, tag_spacing, rows, cols)
-    
-    # Lists to store object points and image points from all images
-    objpoints = []  # 3D points in world space
-    imgpoints = []  # 2D points in image plane
-    
-    # Process each image
-    for image_path in image_paths:
-        try:
-            # Detect AprilTags
-            detections, image = detect_apriltags(image_path)
-            
-            if not detections:
-                print(f"No AprilTags detected in {image_path}")
-                continue
-            
-            # Get image size
-            img_height, img_width = image.shape[:2]
-            
-            # Prepare object and image points for this image
-            obj_points_this_img = []
-            img_points_this_img = []
-            
-            # For each detected tag
-            for det in detections:
-                tag_id = det.tag_id
-                
-                # Check if this tag ID is in our board model
-                if tag_id in board_points:
-                    # Add the 3D points for this tag
-                    obj_points_this_img.extend(board_points[tag_id])
-                    
-                    # Add the corresponding 2D points (detected corners)
-                    img_points_this_img.extend(det.corners)
-            
-            # If we have enough points, add them to our lists
-            if len(obj_points_this_img) >= 4:  # need at least 4 points
-                objpoints.append(np.array(obj_points_this_img, dtype=np.float32))
-                imgpoints.append(np.array(img_points_this_img, dtype=np.float32))
-                print(f"Added {len(obj_points_this_img)} points from {image_path}")
-            
-        except Exception as e:
-            print(f"Error processing {image_path}: {e}")
-    
-    if not objpoints:
-        raise ValueError("No valid calibration points found in any image")
-    
-    # Calibrate camera
-    print(f"Calibrating camera with {len(objpoints)} images...")
-    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
-        objpoints, imgpoints, (img_width, img_height), None, None)
-    
-    return ret, mtx, dist, rvecs, tvecs
+    half = tag_size / 2.0
+    # tag corner offsets from center in world frame (clockwise order matching detector)
+    corner_offsets = np.array([
+        [-half,  half, 0],  # top-left
+        [ half,  half, 0],  # top-right
+        [ half, -half, 0],  # bottom-right
+        [-half, -half, 0],  # bottom-left
+    ], dtype=np.float32)
 
-def save_calibration(output_file, ret, mtx, dist):
-    """Save calibration results to a file"""
-    np.savez(output_file, 
-             camera_matrix=mtx,
-             dist_coeffs=dist, 
-             rms_error=ret)
-    
-    # Also save in a more human-readable format
-    with open(f"{output_file.split('.')[0]}.txt", 'w') as f:
-        f.write(f"RMS Reprojection Error: {ret}\n\n")
-        f.write(f"Camera Matrix:\n{mtx}\n\n")
-        f.write(f"Distortion Coefficients:\n{dist}\n")
-    
-    print(f"Calibration saved to {output_file}")
+    for det in detections:
+        tid = det['id']
+        if tid not in tag_positions:
+            continue
+        center = np.array(tag_positions[tid], dtype=np.float32)
+        # build 4 world pts per tag
+        for i in range(4):
+            obj_pts.append(center + corner_offsets[i])
+            img_pts.append(det['corners'][i])
 
-def main():
-    parser = argparse.ArgumentParser(description='Camera calibration using AprilGrid')
-    path = "/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/controllers/my_first_controller0/source/test_april/image.png"
-    output_path = "/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/controllers/my_first_controller0/source/test_april/output.png"
-    tag_size = 0.088
-    tag_spacing = 0.0264
-    rows = 6
-    cols = 6
+    return np.array(obj_pts, dtype=np.float32), np.array(img_pts, dtype=np.float32)
 
 
-    image_paths = [path]
-    tag_size = 0.088
-    tag_spacing = 0.0264
-    rows = 6
-    cols = 6
-    output_path = output_path
-    
-    # Visualize detections if requested
-    if True:
-        for img_path in image_paths:
-            detections, image = detect_apriltags(img_path)
-            if detections:
-                result = draw_detections(image, detections)
-                
-                # Resize large images for display
-                h, w = result.shape[:2]
-                scale = min(1.0, 1200/max(h, w))
-                if scale < 1.0:
-                    new_h, new_w = int(h*scale), int(w*scale)
-                    result = cv2.resize(result, (new_w, new_h))
-                
-                # Show the result
-                cv2.imshow('AprilTag Detections', result)
-                key = cv2.waitKey(0)
-                if key == 27:  # ESC key
-                    break
-        cv2.destroyAllWindows()
-    
-    # Perform calibration
-    ret, mtx, dist, rvecs, tvecs = calibrate_camera_from_apriltags(
-        image_paths, 
-        tag_size=tag_size,
-        tag_spacing=tag_spacing,
-        rows=rows,
-        cols=cols
+def calibrate_from_image(image_path, tag_size, tag_positions, tag_family="36h11"):
+    # Load and convert to grayscale
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"Could not open image: {image_path}")
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Detect tags
+    detections = detect_apriltags(gray, tag_family=tag_family)
+    print(f"Detected {len(detections)} tags.")
+
+    # Build correspondences
+    obj_pts, img_pts = build_object_points(detections, tag_size, tag_positions)
+    if len(obj_pts) < 6:
+        raise ValueError("Not enough points for calibration. Need at least 6.")
+
+    # prepare for calibrateCamera
+    obj_pts_list = [obj_pts]
+    img_pts_list = [img_pts]
+    img_size = (img.shape[1], img.shape[0])
+
+    # Camera calibration
+    ret, camera_matrix, dist_coefs, rvecs, tvecs = cv2.calibrateCamera(
+        obj_pts_list, img_pts_list, img_size, None, None
     )
-    
-    # Print calibration results
-    print("\nCalibration Results:")
-    print(f"RMS Reprojection Error: {ret}")
-    print(f"\nCamera Matrix:\n{mtx}")
-    print(f"\nDistortion Coefficients:\n{dist}")
-    
-    # Save calibration
-    save_calibration(f"{output_path}", ret, mtx, dist)
+    print(f"Reprojection error: {ret}")
+    return camera_matrix, dist_coefs, rvecs, tvecs
 
-if __name__ == "__main__":
-    main()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Calibrate camera using AprilTag detections."
+    )
+    path = "image.png"
+    tag_size = 0.6
+    tag_positions = "{0:[0,0,0],1:[d,0,0]}"
+    tag_family = "36h11"
+    
+    # Parse tag_positions
+    tag_positions = eval(tag_positions)
+
+    K, dist, rvecs, tvecs = calibrate_from_image(
+        path, tag_size, tag_positions, tag_family
+    )
+    print("Camera matrix (K):\n", K)
+    print("Distortion coefficients: ", dist.ravel())
+    for i, (r, t) in enumerate(zip(rvecs, tvecs)):
+        print(f"Tag {i} pose -> Rvec: {r.ravel()}, Tvec: {t.ravel()}")
