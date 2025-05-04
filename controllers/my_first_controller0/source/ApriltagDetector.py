@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import dt_apriltags
-
+import apriltag
 
 class AprilTagDetector:
 	"""A class for detecting and processing AprilTags in images."""
@@ -48,47 +48,83 @@ class AprilTagDetector:
 		image = self.camera.getImage()
 		image_array = np.frombuffer(image, np.uint8)
 		rgb_image = image_array.reshape((self.height, self.width, 4))
-		gray_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
+		gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
 		fx, fy = 874.5497056724861, 876.8411106683374
 		cx, cy = 1279.315, 722.6236
-		camera_params = [fx, fy, cx, cy]
-		distortion = [[-0.4856, -20.664, -0.0049, -0.0007, 276.5148]]
+		
+		camera_matrix = np.array([[fx, 0, cx],
+								  [0, fy, cy],
+								  [0, 0, 1]], dtype=np.float32)
+		
+		distortion = np.array([-0.4856, -20.664, -0.0049, -0.0007, 276.5148])
 		# Store detected tag locations
 		tag_locations = {}
 
-		# Detect tags and estimate their poses
-		detections = self.detector.detect(
-			gray_image,
-			estimate_tag_pose=True,
-			camera_params=camera_params,
-			tag_size=0.6,
-
-		)
+		# Detect AprilTags in the image
+		options = apriltag.DetectorOptions(families='tag36h11')
+		detector = apriltag.Detector(options)
+		results = detector.detect(gray)
 		
-		# Process detected tags
-		if not detections:
-			return None
-
-		# Transform and store pose information for each detected tag
-		for detection in detections:
-			# Apply coordinate transformation
-			detection.pose_t = np.array([
-				[0, 0, 1],
-				[1, 0, 0],
-				[0, 1, 0]
-			]) @ detection.pose_t
-
-			if detection.tag_id not in tag_locations:
-				tag_locations[detection.tag_id] = [detection.pose_t.flatten()]
-			else:
-				tag_locations[detection.tag_id].append(detection.pose_t.flatten())
-
+		print(f"Detected {len(results)} tags")
+		for result in results:
+			corners = result.corners
+			corners = np.array([[p[0], p[1]] for p in corners])
+			tag_id = result.tag_id
+			
+			# Calculate distance
+			distance, rvec, tvec = self.calculate_distance(corners, 0.6, camera_matrix, distortion)
+			
+			
+			print(f"Tag ID: {tag_id}, Distance: {distance:.3f} meters")
+			print(f"Translation Vector: {tvec.flatten()}")
+			
+		# cv2.imshow("AprilTag Detection", gray)
+		# cv2.waitKey(0)
+		# cv2.destroyAllWindows()
 		# Debug output for detected tags
 		# for tag_id, poses in tag_locations.items():
 		# 	print(f"Tag ID: {tag_id}, Poses: {poses}")
 		# print("_" * 20)
 
 		return tag_locations
+
+	def calculate_distance(self,corners, tag_size, camera_matrix, dist_coeffs):
+		"""
+		Calculate distance to the tag from the camera
+		
+		Args:
+			corners: The four corners of the detected tag
+			tag_size: The physical size of the tag in meters
+			camera_matrix: Camera intrinsic parameters
+			dist_coeffs: Camera distortion coefficients
+		
+		Returns:
+			distance: Distance from camera to tag in meters
+			rvec: Rotation vector
+			tvec: Translation vector
+		"""
+		# Define 3D points of the tag in its own coordinate system
+		# The tag is centered at the origin with the specified size
+		half_size = tag_size / 2
+		obj_points = np.array([
+			[-half_size, -half_size, 0],
+			[ half_size, -half_size, 0],
+			[ half_size,  half_size, 0],
+			[-half_size,  half_size, 0]
+		], dtype=np.float32)
+		
+		# Convert corners to the format expected by solvePnP
+		img_points = np.array(corners, dtype=np.float32)
+		
+		# Solve for pose
+		success, rvec, tvec = cv2.solvePnP(
+			obj_points, img_points, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE
+		)
+		
+		# Calculate distance from camera to the center of the tag
+		distance = np.linalg.norm(tvec)
+		
+		return distance, rvec, tvec
