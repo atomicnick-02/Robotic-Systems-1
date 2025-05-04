@@ -52,14 +52,13 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 1019.77, 1019.77
-		cx, cy = 1280.124, 720.1026
-		
+		fx, fy = 639.75776395016, 640.0854573573423
+		cx, cy = 636.8840094939992, 361.94263630419385			
 		camera_matrix = np.array([[fx, 0, cx],
 								  [0, fy, cy],
 								  [0, 0, 1]], dtype=np.float32)
 		camera_matrix = [fx, fy, cx, cy]
-		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.6)
+		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.5)
 
 		# Store detected tag locations
 		tag_locations = {}
@@ -74,7 +73,7 @@ class AprilTagDetector:
 			else:
 				tag_locations[tag_id].append(tvec)
 		# cv2.imshow("AprilTag Detection", gray)
-		# cv2.waitKey(1)
+		# cv2.waitKey(0)
 		# Debug output for detected tags
 		# for tag_id, poses in tag_locations.items():
 		# 	print(f"Tag ID: {tag_id}, Poses: {poses}")

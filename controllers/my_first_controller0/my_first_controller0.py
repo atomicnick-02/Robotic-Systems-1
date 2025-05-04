@@ -127,7 +127,12 @@ def run():
 		image_array = np.frombuffer(image, np.uint8)
 		rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
 		gray_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
-		cv2.imwrite("source/test_april/image3.png", gray_image)
+		timestep = str(robot.getTime())
+		print(timestep[-2:])
+		# dest_file = f"source/test_april/image{timestep[-2:]}.png"
+		# cv2.imwrite(dest_file, gray_image)
+		# print(dest_file)
+		# cv2.imwrite("source/test_april/image3.png", gray_image)
 		res = ctx['AprilTagDetector'].detect(image)
 		
 		print(res)
