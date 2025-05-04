@@ -93,18 +93,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Calibrate camera using AprilTag detections."
     )
-    path = "image.png"
-    tag_size = 0.6
-    tag_positions = "{0:[0,0,0],1:[d,0,0]}"
-    tag_family = "36h11"
     
-    # Parse tag_positions
-    tag_positions = eval(tag_positions)
-
+    path = "/home/nick/Documents/School/Semester_8_Projects/Robotic-Systems-1/controllers/my_first_controller0/source/test_april/image.png"
+    tag_size = 0.6
+    tag_positions = {0:[2.5, 0.0, 0.3], 1:[2.5, -0.6, 0.3]}
+    tag_family = "tag36h11"
+    
     K, dist, rvecs, tvecs = calibrate_from_image(
         path, tag_size, tag_positions, tag_family
     )
+    
     print("Camera matrix (K):\n", K)
     print("Distortion coefficients: ", dist.ravel())
+    
     for i, (r, t) in enumerate(zip(rvecs, tvecs)):
         print(f"Tag {i} pose -> Rvec: {r.ravel()}, Tvec: {t.ravel()}")

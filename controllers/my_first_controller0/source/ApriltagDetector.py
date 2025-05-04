@@ -299,8 +299,8 @@ class AprilTagDetector:
 		if not self.camera_params:
 			print("Warning: Camera not calibrated, using approximate parameters")
 			# Use approximate parameters based on image size
-			fx, fy = 1050, 1050
-			cx, cy = self.width / 2, self.height / 2
+			fx, fy = 290.650, 581.778
+			cx, cy = 1294.43, 746.4
 			camera_params = [fx, fy, cx, cy]
 		else:
 			camera_params = self.camera_params
