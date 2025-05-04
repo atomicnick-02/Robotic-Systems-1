@@ -11,7 +11,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.06578206235292561 0.9412272735610385 0.331306413728213 0.4158501264382804
-  position -3.3128994633705062 -0.7175564353011257 2.241041203287603
+  position -1.9068998688595264 -0.4330396793108113 1.081553228475148
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -703,7 +703,7 @@ Group {
       rotationStep 0
     }
     DEF pic0 Transform {
-      translation 1.10001 0.829678 0.3
+      translation 0.841881 0.490046 0.3
       rotation 0 0 1 3.14154
       scale 0.001 0.297 0.21
       children [
