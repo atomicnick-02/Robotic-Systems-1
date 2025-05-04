@@ -1,7 +1,7 @@
 from controller import Robot, Supervisor, PositionSensor
 from source.Odometry import Odometry
 import numpy as np
-
+import cv2
 from source.ApriltagDetector import AprilTagDetector
 np.set_printoptions(suppress=True, precision=4)
 # Constants
@@ -122,8 +122,15 @@ def run():
 		
 		# SECTION - Measurements	
 		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
-		res = ctx['AprilTagDetector'].detect(image)
-		print(res)
+		# res = ctx['AprilTagDetector'].detect(image)
+		# write image to file
+		image_array = np.frombuffer(image, np.uint8)
+		rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
+		gray_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
+		cv2.imwrite("source/test_april/image.png", gray_image)
+
+		
+		# print(res)
 		odometry.update_last_encoder_values() # Read encoders
 		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
 		# !SECTION - Measurements
