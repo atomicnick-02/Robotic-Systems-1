@@ -52,8 +52,9 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 639.75776395016, 640.0854573573423
-		cx, cy = 636.8840094939992, 361.94263630419385			
+		fx, fy = 656.9074402339492, 602.702908953368
+		cx, cy = 699.3326815009617, 337.3339442434632
+
 		camera_matrix = np.array([[fx, 0, cx],
 								  [0, fy, cy],
 								  [0, 0, 1]], dtype=np.float32)

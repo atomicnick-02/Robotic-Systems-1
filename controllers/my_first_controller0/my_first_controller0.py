@@ -133,12 +133,17 @@ def run():
 		r_phi_dict = odometry.transform_aruco_to_world(res)
 		print(res)
 		#SECTION -  If u want to see what the robot sees
-		# image_array = np.frombuffer(image, np.uint8)
-		# rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
-		# gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
-		# cv2.imshow('image', gray)
-		# cv2.waitKey(0)
-		# cv2.destroyAllWindows()
+		image_array = np.frombuffer(image, np.uint8)
+		rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
+		gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
+		cv2.imshow('image', gray)
+		cv2.waitKey(900)
+		cv2.destroyAllWindows()
+		timestep = str(robot.getTime())
+		print(timestep[2:])
+		cv2.imwrite(f'img{timestep[2:]}.png', gray)
+		
+
 		#!SECTION
 
 		# SECTION - Motor Actions
