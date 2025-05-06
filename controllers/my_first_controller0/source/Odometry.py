@@ -27,8 +27,11 @@ class Odometry:
 		# The last encoder values
 		self.enc_tp = (0, 0) # Left and right encoder values past
 		self.enc_tc = (0, 0) # Left and right encoder values current
-
-
+		# Robot World Position
+		self.position = np.array([0, 0, 0]) # theta, x ,y
+		self.Vb = np.array([0, 0, 0]) # Linear Velocity, Angular Velocity, Heading
+		self.Vw = np.array([0, 0])
+		self.robot_pose = np.eye(4)
 	def update_last_encoder_values(self):
 		"""
 		Update the last encoder values with the current values.
@@ -48,7 +51,7 @@ class Odometry:
 		
 		return l_encoder_value, r_encoder_value
 	
-	def calculate_distance(self) -> tuple:
+	def cal_distance(self) -> tuple:
 		"""
 		Calculate the distance traveled by the left and right wheels
 		since the last encoder reading.
@@ -62,7 +65,7 @@ class Odometry:
 		right_distance = (r_encoder_value - self.enc_tp[1]) * self.wheel_radius
 
 		return left_distance, right_distance
-	def calculate_angular_vel(self) -> tuple:
+	def cal_angular_vel(self) -> tuple:
 		"""
 		Calculate the angular velocity of the robot based on the wheel speeds.
 
@@ -78,7 +81,7 @@ class Odometry:
 		right_angular_velocity = round(right_distance / self.dt *1000, 4)
 		
 		return left_angular_velocity, right_angular_velocity
-	def calculate_linear_vel(self) -> tuple:
+	def cal_linear_vel(self) -> tuple:
 		"""
 		Calculate the wheel speeds based on the encoder values.
 
@@ -91,4 +94,24 @@ class Odometry:
 		right_speed = right_distance / self.dt
 		speed = (left_speed + right_speed) / 2
 		return round(speed, 3)
+	def cal_world_movement():
+		pass
+
+	def cal_arouco_to_world(self, aruco_dict: dict) -> dict:
+		"""
+		Calculate the position of the Aruco tags in world coordinates.
+
+		Args:
+			aruco_dict: A dictionary containing the Aruco tag IDs and their positions.
+
+		Returns:
+			A dictionary containing the Aruco tag IDs and r,phi.
+		"""
+		for key in aruco_dict:
+			# if the item has more than 1 values
+			print(f"key: {key}")
+			if len(aruco_dict[key]) > 0:
+				for item in aruco_dict[key]:
+					print(item)
+		return aruco_dict
 

@@ -126,20 +126,18 @@ def run():
 		# write image to file
 		image_array = np.frombuffer(image, np.uint8)
 		rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
-		gray_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
-		timestep = str(robot.getTime())
-		print(timestep[-2:])
-		# dest_file = f"source/test_april/image{timestep[-2:]}.png"
-		# cv2.imwrite(dest_file, gray_image)
-		# print(dest_file)
-		# cv2.imwrite("source/test_april/image3.png", gray_image)
-		res = ctx['AprilTagDetector'].detect(image)
 		
-		print(res)
+		
+		# !SECTION - Measurements
+		
+		res = ctx['AprilTagDetector'].detect(image)
+		cal_sensor_val = ctx['cal_ds'].getValue()
+
+		# odometry.cal_arouco_to_world(res)
 		odometry.update_last_encoder_values() # Read encoders
 		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
-		# !SECTION - Measurements
-
+		
+		
 		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0

@@ -9,7 +9,7 @@ WorldInfo {
   basicTimeStep 10
 }
 Viewpoint {
-  orientation 0.09640956955398292 0.9587507378079925 -0.2673989858826048 0.7193662522185077
+  orientation 0.09640956955398293 0.9587507378079927 -0.26739898588260486 0.7193662522185079
   position -2.8423001949818474 0.5276428614526736 2.7797266076253457
   follow "Pioneer 2"
   followType "Mounted Shot"
@@ -29,7 +29,7 @@ RectangleArena {
 Robot {
   children [
     Camera {
-      translation 0.1 0 0.3
+      translation 0 0 0.3
       fieldOfView 1.5708
       width 1280
       height 720
@@ -41,11 +41,11 @@ Robot {
       }
     }
     DistanceSensor {
-      translation 0.1 0 0.3
+      translation 0 0 0.3
       name "cal_ds"
       lookupTable [
-        0 0 0.01
-        2.5 250 0.001
+        0 0 0
+        2.51 251 0
       ]
     }
     Group {
@@ -154,7 +154,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0 -0.16030000000000044 0.0825
-        rotation 0.6879677669702223 -0.6879677669702207 -0.23108592172612824 2.6873939999999994
+        rotation 0.6879677669702222 -0.6879677669702206 -0.2310859217261282 2.6873939999999994
         children [
           USE WHEEL
         ]
