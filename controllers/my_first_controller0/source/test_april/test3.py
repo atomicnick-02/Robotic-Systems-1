@@ -28,7 +28,7 @@ os.chdir('./controllers/my_first_controller0/source/test_april/')
 images = glob.glob('*.png')
 
 for fname in images:
-	if fname == '80_80chess.png':
+	if fname == '80_80chess.png' or fname == 'Checkerboard-A4-25mm-10x7.png':
 		continue
 	img = cv.imread(fname)
 	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -44,7 +44,7 @@ for fname in images:
 		# Draw and show corners
 		cv.drawChessboardCorners(img, chessboard_size, corners2, ret)
 		cv.imshow('img', img)
-		cv.waitKey(300)
+		cv.waitKey(200)
 
 cv.destroyAllWindows()
 
