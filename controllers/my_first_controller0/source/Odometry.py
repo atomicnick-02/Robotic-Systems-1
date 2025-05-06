@@ -102,18 +102,20 @@ class Odometry:
 		print(f"robot pose: {robot_state.T}")
 		robot_pose = robot_state[1:,:]
 		theta = robot_state[0]
-		
+		result_dict = {} #store the Id: r,phi
 		for key in aruco_dict:
 			# if the item has more than 1 values
 			print(f"key: {key}")
 			if len(aruco_dict[key]) > 0:
+
 				for item in aruco_dict[key]:
 					temp_res = item[:2,:] + robot_pose
 					# print(temp_res.T)
-					r = np.linalg.norm(temp_res.T)
+					r = float(np.linalg.norm(temp_res.T))
 					phi = np.arctan2(temp_res[1], temp_res[0]) - theta
-					phi = angle_dist(phi,0)
-					print(f"r: {r}, phi: {phi}")
+					phi = float(angle_dist(phi,0))
+					if key not in result_dict:
+						result_dict[key] = []
+					result_dict[key].append((r, phi))
 					
-					
-		return aruco_dict
+		return result_dict
