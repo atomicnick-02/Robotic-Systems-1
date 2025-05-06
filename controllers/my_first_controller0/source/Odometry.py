@@ -67,7 +67,18 @@ class Odometry:
         self.prev_encoder_values = np.array([left_encoder, right_encoder])
         
         return self.position
-    
+    def get_velocity(self,left_encoder, right_encoder):
+         # Calculate encoder differences
+        encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_encoder_values
+        
+        # Calculate wheel distances
+        wheel_distances = encoder_diff * self.wheel_radius
+        
+        # Calculate robot velocity components
+        v = (wheel_distances[1] + wheel_distances[0]) / 2
+        w = (wheel_distances[1] - wheel_distances[0]) / self.wheel_distance
+        
+        return [v,w]
     def get_wheel_velocities(self, left_encoder, right_encoder):
         """
         Calculate the angular velocities of both wheels.
@@ -100,24 +111,22 @@ class Odometry:
             Dictionary of Aruco IDs with corresponding (r, phi) polar coordinates
         """
         theta = self.position[0, 0]
-        robot_position = self.position[1:, :]
+        robot_position = self.position[1:, :] #ignore theta
         
-        result_dict = {}
+        result_arr = []
         
         for aruco_id, positions in aruco_dict.items():
-            if not positions:  # Skip empty lists
-                continue
-                
-            result_dict[aruco_id] = []
+            
             
             for marker_pos in positions:
                 # Transform marker position to world coordinates
-                world_pos = marker_pos[:2, :] + robot_position
+                # world_pos = marker_pos[:2, :] + robot_position #ignore height
                 
+                world_pos = marker_pos[:2, :] #relative to robot position 
                 # Calculate polar coordinates
                 r = float(np.linalg.norm(world_pos.T))
                 phi = angle_normalize(np.arctan2(world_pos[1, 0], world_pos[0, 0]) - theta)
                 
-                result_dict[aruco_id].append((r, float(phi)))
+                result_arr.append([r, float(phi)])
         
-        return result_dict
+        return result_arr

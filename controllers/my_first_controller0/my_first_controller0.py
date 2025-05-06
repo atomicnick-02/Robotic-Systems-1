@@ -1,8 +1,10 @@
-from controller import Robot, Supervisor, PositionSensor
+from controller import Robot
 from source.Odometry import Odometry
 import numpy as np
 import cv2
 from source.ApriltagDetector import AprilTagDetector
+from source.EKFSlam import EKF_SLAM
+
 np.set_printoptions(suppress=True, precision=4)
 # Constants
 MAX_SENSOR_NUMBER = 16
@@ -108,6 +110,11 @@ def run():
 	ctx = initialize(robot)
 	# Initialize odometry
 	odometry = Odometry(robot)
+	
+	# Initialize EKF_SLAM
+	ekf_slam = EKF_SLAM()
+	ekf_slam.set_time_step(0.01)  # 10ms time step
+
 	# robot.step(ctx['time_step'])
 	
 	# Initialize AprilTag detector
@@ -131,7 +138,13 @@ def run():
 		# odometry.cal_arouco_to_world(res)
 		ctx['position'] = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 		r_phi_dict = odometry.transform_aruco_to_world(res)
-		print(res)
+		
+		u = odometry.get_velocity(enc_vals[0], enc_vals[1])
+		#FIXME - ROBOT POSE GETS WRONG ESTIMATE
+		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
+		print(robot_pose, landmarks)
+		
+		
 		#SECTION -  If u want to see what the robot sees
 		# image_array = np.frombuffer(image, np.uint8)
 		# rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
