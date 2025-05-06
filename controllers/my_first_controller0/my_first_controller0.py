@@ -138,9 +138,10 @@ def run():
 		# odometry.cal_arouco_to_world(res)
 		ctx['position'] = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 		r_phi_dict = odometry.transform_aruco_to_world(res)
-		
+		print(ctx['position'])
 		u = odometry.get_velocity(enc_vals[0], enc_vals[1])
-		#FIXME - ROBOT POSE GETS WRONG ESTIMATE
+		
+		# FIXME - ROBOT POSE GETS WRONG ESTIMATE
 		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
 		print(robot_pose, landmarks)
 		
