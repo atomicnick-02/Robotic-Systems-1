@@ -129,11 +129,10 @@ def run():
 		
 		res = ctx['AprilTagDetector'].detect(image)
 		# odometry.cal_arouco_to_world(res)
-		Vb = odometry.cal_Vb(enc_vals[0], enc_vals[1])
-		ctx['position'] = odometry.update_pose(ctx['position'], Vb)
-		odometry.cal_arouco_to_world(ctx['position'], res)
-
-
+		ctx['position'] = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
+		r_phi_dict = odometry.transform_aruco_to_world(res)
+		print(r_phi_dict)
+		
 		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0
