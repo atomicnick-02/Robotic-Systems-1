@@ -1,6 +1,14 @@
 from controller import Robot, PositionSensor
 import numpy as np
 
+def angle_dist(b, a):
+    theta = b - a
+    while theta < -np.pi:
+        theta += 2. * np.pi
+    while theta > np.pi:
+        theta -= 2. * np.pi
+    return theta
+
 
 class Odometry:
 	def __init__(self, robot):
@@ -20,7 +28,6 @@ class Odometry:
 		# Robot World Position
 		self.position = np.array([0., 0., 0.]).reshape(3, 1) # theta, x ,y
 		self.dt = robot.getBasicTimeStep() / 1000
-		self.robot_pose = np.eye(4)
 		print("#                     Odometry initialized.                      #")
 
 	def cal_distance(self, r_read, l_read) -> tuple:
@@ -51,7 +58,7 @@ class Odometry:
 		right_angular_velocity = round(right_distance / self.dt , 6)
 		
 		return left_angular_velocity, right_angular_velocity
-	def cal_linear_vel(self, r_read, l_read) -> tuple:
+	def cal_Vb(self, r_read, l_read) -> tuple:
 		"""
 		Calculate the wheel speeds based on the encoder values.
 
@@ -62,24 +69,27 @@ class Odometry:
 		right_distance = (r_read - self.enc_tp[1]) 
 		self.enc_tp = (l_read, r_read) # Update the last encoder values
 		
-		l_lin_vel = round(left_distance / self.dt * 1000, 6) * self.wheel_radius
-		r_lin_vel = round(right_distance / self.dt *1000, 6) * self.wheel_radius
+		l_lin_vel = round(left_distance  , 6) * self.wheel_radius
+		r_lin_vel = round(right_distance , 6) * self.wheel_radius
 
-		dtheta = (r_lin_vel - l_lin_vel) / self.wheel_distance
-		dxy = (r_lin_vel + l_lin_vel) / 2
-		dx = dxy * np.cos(dtheta)
-		dy = dxy * np.sin(dtheta)
+		w = (r_lin_vel - l_lin_vel) / self.wheel_distance
+		V = (r_lin_vel + l_lin_vel) / 2	
 		
-		dpos = np.array([dx, dy, dtheta]).reshape(3, 1)
-		self.position = self.position + dpos
-		print("Position:", self.position.T)
+		return np.array([[V, w]]).T
 
-		print("dpos:", dpos.T)
-		
-		return self.position
+	def update_pose(self, position:np.array, V:np.array):
+		"""
+		Update the robot position given its previous and its Velocity tuple
+		"""
+		u = V[0]
+		w = V[1]
+		dx = u * np.cos(w)
+		dy = u * np.sin(w)
+		dpos = np.array([w, dx, dy]).T
 
-
-	def cal_arouco_to_world(self, aruco_dict: dict) -> dict:
+		position = position + dpos.T
+		return position
+	def cal_arouco_to_world(self, robot_state:np.array, aruco_dict: dict) -> dict:
 		"""
 		Calculate the position of the Aruco tags in world coordinates.
 
@@ -89,10 +99,21 @@ class Odometry:
 		Returns:
 			A dictionary containing the Aruco tag IDs and r,phi.
 		"""
+		print(f"robot pose: {robot_state.T}")
+		robot_pose = robot_state[1:,:]
+		theta = robot_state[0]
+		
 		for key in aruco_dict:
 			# if the item has more than 1 values
 			print(f"key: {key}")
 			if len(aruco_dict[key]) > 0:
 				for item in aruco_dict[key]:
-					print(item)
+					temp_res = item[:2,:] + robot_pose
+					# print(temp_res.T)
+					r = np.linalg.norm(temp_res.T)
+					phi = np.arctan2(temp_res[1], temp_res[0]) - theta
+					phi = angle_dist(phi,0)
+					print(f"r: {r}, phi: {phi}")
+					
+					
 		return aruco_dict

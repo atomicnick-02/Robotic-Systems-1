@@ -98,15 +98,17 @@ def initialize(robot) -> dict:
 		'right_encoder': right_encoder,
 		'camera': cam,
 		'cal_ds': cal_ds,
+		'position': np.array([[0.],[0.] , [0.]])
+
 	}
 
 
 def run():
 	robot = Robot()
 	ctx = initialize(robot)
-	robot.step(ctx['time_step'])
 	# Initialize odometry
 	odometry = Odometry(robot)
+	# robot.step(ctx['time_step'])
 	
 	# Initialize AprilTag detector
 	if ctx['camera']:
@@ -121,23 +123,26 @@ def run():
 		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
 		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
 		cal_sensor_val = ctx['cal_ds'].getValue()
+		enc_vals = [ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue()]
 
 		# !SECTION - Measurements
 		
 		res = ctx['AprilTagDetector'].detect(image)
 		# odometry.cal_arouco_to_world(res)
-		enc_vals = (ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue())
-		print(odometry.cal_angular_vel(enc_vals[0], enc_vals[1]))
-		
+		Vb = odometry.cal_Vb(enc_vals[0], enc_vals[1])
+		ctx['position'] = odometry.update_pose(ctx['position'], Vb)
+		odometry.cal_arouco_to_world(ctx['position'], res)
+
+
 		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0
 		for i, val in enumerate(readings):
 			factor = 1.0 - (val / ctx['range'])
-			# speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
-			# speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
-			speed_l += 10
-			speed_r += 10
+			speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
+			speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
+			# speed_l += 10
+			# speed_r += 10
 		# Clamp
 		speed_l = bound(speed_l, -ctx['max_speed'], ctx['max_speed'])
 		speed_r = bound(speed_r, -ctx['max_speed'], ctx['max_speed'])

@@ -59,24 +59,23 @@ class AprilTagDetector:
 								  [0, 0, 1]], dtype=np.float32)
 		camera_matrix = [fx, fy, cx, cy]
 		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.4842) # 0.4842
-
+		
+		# sort the tags based on location
 		# Store detected tag locations
 		tag_locations = {}
 		for tag in tags:
 			tag_id = tag.tag_id
 			# rotate the translation vector
 			tvec = tag.pose_t
-			tvec = np.array([[tvec[2]], [tvec[0]], [tvec[1]]]).flatten()
-			# print(f"{tvec.T}")
+			tvec = np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]]) @ tvec
 			if tag_id not in tag_locations:
 				tag_locations[tag_id] = [tvec]
 			else:
 				tag_locations[tag_id].append(tvec)
-		# cv2.imshow("AprilTag Detection", gray)
-		# cv2.waitKey(0)
-		# Debug output for detected tags
-		# for tag_id, poses in tag_locations.items():
-		# 	print(f"Tag ID: {tag_id}, Poses: {poses}")
-		# print("_" * 20)
-
+		
+		for tag_id, tvec_list in tag_locations.items():
+			tag_locations[tag_id] = sorted(
+        	    tvec_list,
+    	        key=lambda t: np.linalg.norm(t)
+        	)
 		return tag_locations
