@@ -9,8 +9,8 @@ WorldInfo {
   basicTimeStep 10
 }
 Viewpoint {
-  orientation 0.029922541764032376 0.9897482196445533 -0.1396535112512996 0.4262900756856246
-  position -5.349806690819949 0.2170277144286864 3.2671015013379883
+  orientation 0.12818443886485206 0.19343764188141724 -0.9727027440776856 1.1960561978097857
+  position -0.5957631774126897 2.0194608788945034 0.8413703600486664
   follow "Pioneer 2"
   followType "Mounted Shot"
 }
@@ -29,7 +29,18 @@ RectangleArena {
 Robot {
   children [
     Camera {
-      translation 0 0 0.3
+      translation 0.1 0 0.4
+      rotation 0 -1 0 -0.261795307179586
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.3 0.5 0.02
+          }
+          geometry Box {
+            size 0.1 0.05 0.06
+          }
+        }
+      ]
       fieldOfView 1.5708
       width 1280
       height 720
@@ -572,16 +583,16 @@ Group {
 }
 Group {
   children [
-    DEF pic0 Transform {
-      translation 2.5 0 0.3
-      rotation 0 0 1 3.14154
+    DEF pic1 Transform {
+      translation 1.5 1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.14
       scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "../apriltags36h11_100by100/tag36h11_100_0.png"
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
               ]
               filtering 0
             }
@@ -640,16 +651,16 @@ Group {
       translationStep 0
       rotationStep 0
     }
-    DEF pic0 Transform {
-      translation 2.5 -0.6 0.3
-      rotation 0 0 1 3.14154
+    DEF pic1 Transform {
+      translation 1.5 0 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
       scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "../apriltags36h11_100by100/tag36h11_100_0.png"
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
               ]
               filtering 0
             }
@@ -709,9 +720,9 @@ Group {
       rotationStep 0
     }
     DEF pic1 Transform {
-      translation 0.217225 -2.43557 0.3
-      rotation -0.013653703288840323 -0.0048045511572978586 0.9998952408500988 1.56929
-      scale 0.05 0.3 0.3
+      translation 1.5 -1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -777,9 +788,9 @@ Group {
       rotationStep 0
     }
     DEF pic1 Transform {
-      translation 1.46746 -0.881767 0.3
-      rotation 0 0 1 1.97862
-      scale 0.05 0.6 0.6
+      translation -1.5 -1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -845,9 +856,9 @@ Group {
       rotationStep 0
     }
     DEF pic1 Transform {
-      translation 1.46987 0.521156 0.3
-      rotation 0 0 1 -2.3267253071795864
-      scale 0.05 0.6 0.6
+      translation -1.5 1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
@@ -912,16 +923,16 @@ Group {
       translationStep 0
       rotationStep 0
     }
-    DEF pic2 Transform {
-      translation -2.48913 0.0958783 0.413064
-      rotation -0.4309450600274427 -0.898907125211079 -0.07907171101410142 0.0205195
-      scale 0.05 0.3 0.3
+    DEF pic1 Transform {
+      translation -1.5 0 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "../apriltags36h11_100by100/tag36h11_100_2.png"
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
               ]
               filtering 0
             }
@@ -980,16 +991,16 @@ Group {
       translationStep 0
       rotationStep 0
     }
-    DEF pic3 Transform {
-      translation 0.195191 2.43321 0.441854
-      rotation 0.004990580193809843 -0.013229000513749986 -0.9999000388312504 1.61728
-      scale 0.05 0.3 0.3
+    DEF pic1 Transform {
+      translation 0 1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "../apriltags36h11_100by100/tag36h11_100_3.png"
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
               ]
               filtering 0
             }
@@ -1048,16 +1059,16 @@ Group {
       translationStep 0
       rotationStep 0
     }
-    DEF pic4 Transform {
-      translation 1.04594 1.03425 -0.0224921
-      rotation 0.7016342644018606 -9.114583434713698e-07 0.7125372685105177 3.14159
-      scale 0.05 0.3 0.3
+    DEF pic1 Transform {
+      translation 0 -1.5 0
+      rotation 0.7071067811865475 0 0.7071067811865475 3.141592653589
+      scale 0.001 0.6 0.6
       children [
         Shape {
           appearance PBRAppearance {
             baseColorMap ImageTexture {
               url [
-                "../apriltags36h11_100by100/tag36h11_100_4.png"
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
               ]
               filtering 0
             }

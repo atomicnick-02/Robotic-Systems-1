@@ -131,8 +131,16 @@ def run():
 		# odometry.cal_arouco_to_world(res)
 		ctx['position'] = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 		r_phi_dict = odometry.transform_aruco_to_world(res)
-		print(r_phi_dict)
-		
+		print(res)
+		#SECTION -  If u want to see what the robot sees
+		# image_array = np.frombuffer(image, np.uint8)
+		# rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
+		# gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
+		# cv2.imshow('image', gray)
+		# cv2.waitKey(0)
+		# cv2.destroyAllWindows()
+		#!SECTION
+
 		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0
