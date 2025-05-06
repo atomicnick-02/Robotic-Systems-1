@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Odometry:
-	def __init__(self, robot: Robot, ctx: dict = None):
+	def __init__(self, robot):
 		"""
 		Initialize the Odometry class with a robot instance.
 		This class is only responsible for odometry calculations
@@ -12,46 +12,18 @@ class Odometry:
 		Args:
 			robot: An instance of the Robot class from the Webots API.
 		"""
-		self.robot = robot
-		# Initialize robot parameters
-		self.dt = int(robot.getBasicTimeStep())
-		self.l_encoder = ctx['left_encoder'] if ctx else robot.getDevice("left wheel sensor")
-		self.r_encoder = ctx['right_encoder'] if ctx else robot.getDevice("right wheel sensor")
-
-		# Initialize encoders
-		self.l_encoder.enable(self.dt)
-		self.r_encoder.enable(self.dt)
 		# Init the robot's wheel radius and distance between wheels
 		self.wheel_radius = 0.0825  # in meters
 		self.wheel_distance = 0.331
 		# The last encoder values
-		self.enc_tp = (0, 0) # Left and right encoder values past
-		self.enc_tc = (0, 0) # Left and right encoder values current
+		self.enc_tp = (0., 0.) # Left and right encoder values past
 		# Robot World Position
-		self.position = np.array([0, 0, 0]) # theta, x ,y
-		self.Vb = np.array([0, 0, 0]) # Linear Velocity, Angular Velocity, Heading
-		self.Vw = np.array([0, 0])
+		self.position = np.array([0., 0., 0.]).reshape(3, 1) # theta, x ,y
+		self.dt = robot.getBasicTimeStep() / 1000
 		self.robot_pose = np.eye(4)
-	def update_last_encoder_values(self):
-		"""
-		Update the last encoder values with the current values.
-		"""
-		self.enc_tp = self.enc_tc
-		self.enc_tc = self.read_encoders() 
-	
-	def read_encoders(self) -> tuple:
-		"""
-		Read the current values of the left and right encoders.
+		print("#                     Odometry initialized.                      #")
 
-		Returns:
-			A tuple containing the left and right encoder values.
-		"""
-		l_encoder_value = self.l_encoder.getValue()
-		r_encoder_value = self.r_encoder.getValue()
-		
-		return l_encoder_value, r_encoder_value
-	
-	def cal_distance(self) -> tuple:
+	def cal_distance(self, r_read, l_read) -> tuple:
 		"""
 		Calculate the distance traveled by the left and right wheels
 		since the last encoder reading.
@@ -59,43 +31,53 @@ class Odometry:
 		Returns:
 			A tuple containing the distance traveled by the left and right wheels.
 		"""
-		l_encoder_value, r_encoder_value = self.read_encoders()
-		
-		left_distance = (l_encoder_value - self.enc_tp[0]) * self.wheel_radius
-		right_distance = (r_encoder_value - self.enc_tp[1]) * self.wheel_radius
-
+		left_distance = (l_read) * self.wheel_radius
+		right_distance = (r_read) * self.wheel_radius
+		self.enc_tp = (l_read, r_read) # Update the last encoder values
 		return left_distance, right_distance
-	def cal_angular_vel(self) -> tuple:
+	
+	def cal_angular_vel(self, r_read, l_read) -> tuple:
 		"""
 		Calculate the angular velocity of the robot based on the wheel speeds.
 
 		Returns:
 			A tuple containing the left and right angular velocities.
 		"""
-		l_enc_diff = self.enc_tc[0] - self.enc_tp[0]
-		r_enc_diff = self.enc_tc[1] - self.enc_tp[1]
-		left_distance = l_enc_diff 
-		right_distance = r_enc_diff 
+		left_distance = (l_read - self.enc_tp[0]) 
+		right_distance = (r_read - self.enc_tp[1]) 
+		self.enc_tp = (l_read, r_read) # Update the last encoder values
 		
-		left_angular_velocity = round(left_distance / self.dt * 1000, 4) # I am dealing with milliseconds
-		right_angular_velocity = round(right_distance / self.dt *1000, 4)
+		left_angular_velocity = round(left_distance / self.dt , 6) # I am dealing with milliseconds
+		right_angular_velocity = round(right_distance / self.dt , 6)
 		
 		return left_angular_velocity, right_angular_velocity
-	def cal_linear_vel(self) -> tuple:
+	def cal_linear_vel(self, r_read, l_read) -> tuple:
 		"""
 		Calculate the wheel speeds based on the encoder values.
 
 		Returns:
 			A tuple containing the left and right wheel speeds.
 		"""
-		left_distance, right_distance = self.calculate_distance()
+		left_distance = (l_read - self.enc_tp[0]) 
+		right_distance = (r_read - self.enc_tp[1]) 
+		self.enc_tp = (l_read, r_read) # Update the last encoder values
 		
-		left_speed = left_distance / self.dt
-		right_speed = right_distance / self.dt
-		speed = (left_speed + right_speed) / 2
-		return round(speed, 3)
-	def cal_world_movement():
-		pass
+		l_lin_vel = round(left_distance / self.dt * 1000, 6) * self.wheel_radius
+		r_lin_vel = round(right_distance / self.dt *1000, 6) * self.wheel_radius
+
+		dtheta = (r_lin_vel - l_lin_vel) / self.wheel_distance
+		dxy = (r_lin_vel + l_lin_vel) / 2
+		dx = dxy * np.cos(dtheta)
+		dy = dxy * np.sin(dtheta)
+		
+		dpos = np.array([dx, dy, dtheta]).reshape(3, 1)
+		self.position = self.position + dpos
+		print("Position:", self.position.T)
+
+		print("dpos:", dpos.T)
+		
+		return self.position
+
 
 	def cal_arouco_to_world(self, aruco_dict: dict) -> dict:
 		"""
@@ -114,4 +96,3 @@ class Odometry:
 				for item in aruco_dict[key]:
 					print(item)
 		return aruco_dict
-

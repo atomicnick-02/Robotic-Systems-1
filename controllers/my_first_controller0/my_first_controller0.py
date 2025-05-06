@@ -104,49 +104,40 @@ def initialize(robot) -> dict:
 def run():
 	robot = Robot()
 	ctx = initialize(robot)
+	robot.step(ctx['time_step'])
 	# Initialize odometry
 	odometry = Odometry(robot)
-	odometry.update_last_encoder_values() # Create the zero point
-	print("Timestep:", ctx['time_step'])
-	# np.set_printoptions(suppress = True, precision = 4)
 	
 	# Initialize AprilTag detector
 	if ctx['camera']:
 		print("focal length:", ctx['camera'].getFocalLength())
 		ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
-		print("AprilTag detector initialized.")
-
+		print("#                     AprilTagDetector initialized.              #")
 		
 	print("Starting main loop...")
 	while robot.step(ctx['time_step']) != -1:
 		
 		# SECTION - Measurements	
 		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
-		# res = ctx['AprilTagDetector'].detect(image)
-		# write image to file
-		image_array = np.frombuffer(image, np.uint8)
-		rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
-		
-		
+		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
+		cal_sensor_val = ctx['cal_ds'].getValue()
+
 		# !SECTION - Measurements
 		
 		res = ctx['AprilTagDetector'].detect(image)
-		cal_sensor_val = ctx['cal_ds'].getValue()
-
 		# odometry.cal_arouco_to_world(res)
-		odometry.update_last_encoder_values() # Read encoders
-		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
-		
+		enc_vals = (ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue())
+		print(odometry.cal_angular_vel(enc_vals[0], enc_vals[1]))
 		
 		# SECTION - Motor Actions
 		speed_l = 0.0
 		speed_r = 0.0
 		for i, val in enumerate(readings):
 			factor = 1.0 - (val / ctx['range'])
-			speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
-			speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
-			# speed_l -= 0.5
-			# speed_r += 0.5
+			# speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
+			# speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
+			speed_l += 10
+			speed_r += 10
 		# Clamp
 		speed_l = bound(speed_l, -ctx['max_speed'], ctx['max_speed'])
 		speed_r = bound(speed_r, -ctx['max_speed'], ctx['max_speed'])
