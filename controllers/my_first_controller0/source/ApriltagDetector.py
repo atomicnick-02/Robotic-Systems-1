@@ -58,7 +58,7 @@ class AprilTagDetector:
 								  [0, fy, cy],
 								  [0, 0, 1]], dtype=np.float32)
 		camera_matrix = [fx, fy, cx, cy]
-		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.4842) # 0.4842
+		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.48) # 0.48
 		
 		# sort the tags based on location
 		# Store detected tag locations
