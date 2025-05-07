@@ -45,23 +45,23 @@ class Odometry:
         wheel_distances = encoder_diff * self.wheel_radius
         
         # Calculate robot velocity components
-        v = (wheel_distances[1] + wheel_distances[0]) / 2
+        v = (wheel_distances[0] + wheel_distances[1]) / 2
         w = (wheel_distances[1] - wheel_distances[0]) / self.wheel_distance
         
         # Store velocities for possible external use
         self.velocity = np.array([[v], [w]])
         
         # Update position using current orientation
-        theta = self.position[0, 0]
+        theta = self.position[2, 0]
         dx = v * np.cos(theta)
         dy = v * np.sin(theta)
         dtheta = w
         
         # Apply position update
-        self.position += np.array([[dtheta], [dx], [dy]])
+        self.position += np.array([[dx], [dy], [dtheta]])
         
         # Normalize theta to keep it within -π to π
-        self.position[0, 0] = angle_normalize(self.position[0, 0])
+        self.position[2, 0] = angle_normalize(self.position[2, 0])
         
         # Update previous encoder values
         self.prev_encoder_values = np.array([left_encoder, right_encoder])
@@ -110,8 +110,8 @@ class Odometry:
         Returns:
             Dictionary of Aruco IDs with corresponding (r, phi) polar coordinates
         """
-        theta = self.position[0, 0]
-        robot_position = self.position[1:, :] #ignore theta
+        theta = self.position[2, 0]
+        robot_position = self.position[0:2, :] #ignore theta
         
         result_arr = []
         
