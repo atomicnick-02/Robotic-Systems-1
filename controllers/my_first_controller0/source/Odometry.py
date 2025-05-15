@@ -39,13 +39,14 @@ class Odometry:
             Updated position [theta, x, y]
         """
         # Calculate encoder differences
+        print(f"enc values: {left_encoder}, {right_encoder}, {self.prev_encoder_values}")
         encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_encoder_values
         
         # Calculate wheel distances
         wheel_distances = encoder_diff * self.wheel_radius
         
         # Calculate robot velocity components
-        v = (wheel_distances[0] + wheel_distances[1]) / 2
+        v = (wheel_distances[0] + wheel_distances[1]) / (2*5)
         w = (wheel_distances[1] - wheel_distances[0]) / self.wheel_distance
         
         # Store velocities for possible external use

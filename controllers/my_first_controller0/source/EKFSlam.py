@@ -28,7 +28,7 @@ class EKF_SLAM:
         # Threshold for adding new landmarks (chi-square value with p=0.99)
         self.alpha_threshold = 9.21
         # Minimum distance between landmarks to avoid duplicates
-        self.min_landmark_distance = 10.0
+        self.min_landmark_distance = 0.5
         
     def set_noise_parameters(self, R=None, Q=None):
         """
