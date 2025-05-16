@@ -24,7 +24,7 @@ class EKF_SLAM:
         # Default measurement noise (can be modified by setter method)
         self.Q = np.diag([0.1, np.deg2rad(2.0)]) ** 2
         # Time increment
-        self.dt = 1.0
+        self.dt = 32 /1_000
         # Threshold for adding new landmarks (chi-square value with p=0.99)
         self.alpha_threshold = 9.21
         # Minimum distance between landmarks to avoid duplicates

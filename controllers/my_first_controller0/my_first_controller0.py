@@ -140,7 +140,6 @@ def run():
 
 		# print(f"Odometry pose: x={pose[0]:.3f}, y={pose[1]:.3f}, θ={pose[2]:.3f}", end=' ')
 
-		print(res.keys)
 		r_phi_dict = odometry.transform_aruco_to_world(res)
 		print(f"position:{ctx['position'].T}",end=' ')
 
