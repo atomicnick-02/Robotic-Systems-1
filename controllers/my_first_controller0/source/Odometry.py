@@ -1,85 +1,81 @@
-from controller import Robot, PositionSensor
+# Odometry.py
+
+from controller import Robot
 import numpy as np
 
 def angle_normalize(angle):
-    """Normalize angle to be within -π to π range."""
-    return ((angle + np.pi) % (2 * np.pi)) - np.pi
+    """Normalize angle to be within -π to π."""
+    return (angle + np.pi) % (2 * np.pi) - np.pi
 
 class Odometry:
     def __init__(self, robot):
         """
-        Initialize the Odometry class with a robot instance.
-        This class is responsible for odometry calculations.
-
-        Args:
-            robot: An instance of the Robot class from the Webots API.
+        Initialize Odometry with Webots Robot instance.
+        Pose is [x, y, theta], and velocity [v, w].
         """
-        # Robot physical parameters
-        self.wheel_radius = 0.0825  # meters
-        self.wheel_distance = 0.331  # meters
+        # Robot parameters
+        self.wheel_radius   = 0.0825    # m
+        self.wheel_distance = 0.331     # m between wheels
         
-        # Time step
-        self.dt = robot.getBasicTimeStep() / 1000  # convert to seconds
+        # Time step (s)
+        self.dt = robot.getBasicTimeStep() / 1000.0
         
-        # Tracking variables
-        self.prev_encoder_values = np.zeros(2)  # [left, right]
-        self.position = np.zeros((3, 1))  # [theta, x, y]
+        # State
+        self.prev_enc = None            # will hold [left, right] on first update
+        self.position = np.zeros(3)     # [x, y, θ]
+        self.velocity = np.zeros(2)     # [v (m/s), w (rad/s)]
         
         print("# Odometry initialized successfully #")
-    
+
     def update_from_encoders(self, left_encoder, right_encoder):
         """
-        Update robot position based on wheel encoder readings.
+        Read new encoder readings and update pose + velocity.
         
-        Args:
-            left_encoder: Current left wheel encoder value
-            right_encoder: Current right wheel encoder value
-            
         Returns:
-            Updated position [theta, x, y]
+            position: np.array([x, y, θ])
+            velocity: np.array([v, w])
         """
-        # Calculate encoder differences
-        print(f"enc values: {left_encoder}, {right_encoder}, {self.prev_encoder_values}")
-        encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_encoder_values
+        enc = np.array([left_encoder, right_encoder])
         
-        # Calculate wheel distances
-        wheel_distances = encoder_diff * self.wheel_radius
+        # On first call, just store encoders
+        if self.prev_enc is None:
+            self.prev_enc = enc
+            return self.position.copy(), self.velocity.copy()
         
-        # Calculate robot velocity components
-        v = (wheel_distances[0] + wheel_distances[1]) / (2*5)
-        w = (wheel_distances[1] - wheel_distances[0]) / self.wheel_distance
+        # Compute wheel travels
+        delta = enc - self.prev_enc
+        dL = delta[0] * self.wheel_radius
+        dR = delta[1] * self.wheel_radius
         
-        # Store velocities for possible external use
-        self.velocity = np.array([[v], [w]])
+        # Center advance and heading change
+        d_center = (dL + dR) / 2.0
+        d_theta  = (dR - dL) / self.wheel_distance
         
-        # Update position using current orientation
-        theta = self.position[2, 0]
-        dx = v * np.cos(theta)
-        dy = v * np.sin(theta)
-        dtheta = w
+        # Update pose (use midpoint heading for better accuracy)
+        theta_mid = self.position[2] + d_theta / 2.0
+        dx = d_center * np.cos(theta_mid)
+        dy = d_center * np.sin(theta_mid)
         
-        # Apply position update
-        self.position += np.array([[dx], [dy], [dtheta]])
+        self.position[0] += dx
+        self.position[1] += dy
+        self.position[2] = angle_normalize(self.position[2] + d_theta)
         
-        # Normalize theta to keep it within -π to π
-        self.position[2, 0] = angle_normalize(self.position[2, 0])
+        # Compute velocities
+        v = d_center / self.dt
+        w = d_theta  / self.dt
+        self.velocity = np.array([v, w])
         
-        # Update previous encoder values
-        self.prev_encoder_values = np.array([left_encoder, right_encoder])
+        # Save for next iteration
+        self.prev_enc = enc
         
-        return self.position
-    def get_velocity(self,left_encoder, right_encoder):
-         # Calculate encoder differences
-        encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_encoder_values
-        
-        # Calculate wheel distances
-        wheel_distances = encoder_diff * self.wheel_radius
-        
-        # Calculate robot velocity components
-        v = (wheel_distances[1] + wheel_distances[0]) / 2
-        w = (wheel_distances[1] - wheel_distances[0]) / self.wheel_distance
-        
-        return [v,w]
+        return self.position.copy(), self.velocity.copy()
+
+    def get_velocity(self):
+        """
+        Returns the last computed velocities [v, w].
+        """
+        return self.velocity.copy()
+
     def get_wheel_velocities(self, left_encoder, right_encoder):
         """
         Calculate the angular velocities of both wheels.
@@ -111,8 +107,8 @@ class Odometry:
         Returns:
             Dictionary of Aruco IDs with corresponding (r, phi) polar coordinates
         """
-        theta = self.position[2, 0]
-        robot_position = self.position[0:2, :] #ignore theta
+        print(f"pos: {self.position[2]}")
+        theta = self.position[2]
         
         result_arr = []
         
