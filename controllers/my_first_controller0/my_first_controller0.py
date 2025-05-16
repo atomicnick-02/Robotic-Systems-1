@@ -47,8 +47,8 @@ def initialize(robot) -> dict:
 		sensor_prefix = "ds"
 		weights = pioneer2_matrix
 		cal_sesnor_prefix = "cal_ds"
-		max_speed = 10.0 # Angular speed
-		speed_unit = 0.9
+		max_speed = 5.0 # Angular speed
+		speed_unit = 0.4
 	else:
 		print("This controller doesn't support robot:", robot_name)
 		exit(1)
@@ -113,7 +113,7 @@ def run():
 	
 	# Initialize EKF_SLAM
 	ekf_slam = EKF_SLAM()
-	ekf_slam.set_time_step(0.01)  # 10ms time step
+	# ekf_slam.set_time_step(0.01)  # 10ms time step
 
 	# robot.step(ctx['time_step'])
 	
@@ -135,15 +135,24 @@ def run():
 		# !SECTION - Measurements
 		
 		res = ctx['AprilTagDetector'].detect(image)
-		# odometry.cal_arouco_to_world(res)
-		ctx['position'] = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
+		pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
+		ctx['position'] = pose
+
+		# print(f"Odometry pose: x={pose[0]:.3f}, y={pose[1]:.3f}, θ={pose[2]:.3f}", end=' ')
+
+		print(res.keys)
 		r_phi_dict = odometry.transform_aruco_to_world(res)
-		print(ctx['position'])
-		u = odometry.get_velocity(enc_vals[0], enc_vals[1])
+		print(f"position:{ctx['position'].T}",end=' ')
+
+		u = odometry.get_velocity()
 		
 		# FIXME - ROBOT POSE GETS WRONG ESTIMATE
 		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
-		print(robot_pose, landmarks)
+		print(f"robot pose ekf{robot_pose}")
+		print(f"landmarks: \n{landmarks}")
+		print("-"*20)
+
+		
 		
 		
 		#SECTION -  If u want to see what the robot sees
