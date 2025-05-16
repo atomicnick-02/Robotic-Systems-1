@@ -22,7 +22,7 @@ class EKF_SLAM:
         # Default motion noise (can be modified by setter method)
         self.R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2
         # Default measurement noise (can be modified by setter method)
-        self.Q = np.diag([0.5, np.deg2rad(2.0)]) ** 2
+        self.Q = np.diag([0.1, np.deg2rad(2.0)]) ** 2
         # Time increment
         self.dt = 1.0
         # Threshold for adding new landmarks (chi-square value with p=0.99)
