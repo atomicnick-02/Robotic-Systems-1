@@ -156,8 +156,8 @@ class EKF_SLAM:
         # Jacobian of motion model with respect to state
         if abs(w) > 1e-6:
             Gx = np.array([
-                [0, 0, v/w * np.cos(theta) - v/w * np.cos(theta + dtheta)],
-                [0, 0, v/w * np.sin(theta) - v/w * np.sin(theta + dtheta)],
+                [0, 0, -v/w * np.cos(theta) + v/w * np.cos(theta + dtheta)],
+                [0, 0, -v/w * np.sin(theta) + v/w * np.sin(theta + dtheta)],
                 [0, 0, 0]
             ])
         else:
