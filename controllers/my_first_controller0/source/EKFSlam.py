@@ -20,13 +20,14 @@ class EKF_SLAM:
         # Initialize covariance matrix for initial state
         self.Sigma = np.zeros((3, 3))
         # Default motion noise (can be modified by setter method)
-        self.R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2
+        self.R = np.diag([0.1, 0.1, np.deg2rad(2)]) ** 2
         # Default measurement noise (can be modified by setter method)
-        self.Q = np.diag([0.1, np.deg2rad(2.0)]) ** 2
+        self.Q = np.diag([0.5, np.deg2rad(0.5)]) ** 2
         # Time increment
         self.dt = 32 /1_000
         # Threshold for adding new landmarks (chi-square value with p=0.99)
-        self.alpha_threshold = 9.21
+        self.thresholds = {0.1: 4.61, 0.05: 5.99, 0.01: 9.21, 0.001: 13.82}
+        self.alpha_threshold = self.thresholds[0.001]
         # Minimum distance between landmarks to avoid duplicates
         self.min_landmark_distance = 0.5
         
