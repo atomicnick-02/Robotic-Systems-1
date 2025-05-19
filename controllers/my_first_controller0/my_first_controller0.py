@@ -1,9 +1,9 @@
 from controller import Robot
 from source.Odometry import Odometry
 import numpy as np
-import cv2
+import matplotlib as plt
 from source.ApriltagDetector import AprilTagDetector
-from source.EKFSlam import EKF_SLAM
+from source.EKFSlam_KL  import EKF_SLAM
 
 np.set_printoptions(suppress=True, precision=4)
 # Constants
@@ -116,6 +116,9 @@ def run():
 	# ekf_slam.set_time_step(0.01)  # 10ms time step
 
 	# robot.step(ctx['time_step'])
+	# enc_vals = [ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue()]		
+	# pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
+
 	
 	# Initialize AprilTag detector
 	if ctx['camera']:
@@ -148,12 +151,15 @@ def run():
 		# FIXME - ROBOT POSE GETS WRONG ESTIMATE
 		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
 		print(f"robot pose ekf{robot_pose}")
-		print(f"landmarks: \n{landmarks}")
-		print("-"*20)
-
-		
-		
-		
+		try:
+			print(f"landmarks: {len(landmarks)}\n{landmarks}")
+			error = (pose - robot_pose)/robot_pose *100
+			print(error)
+			
+			print("-"*20)
+			ekf_slam.plot_landmarks(landmarks, ctx['position'])
+		except:
+			print("No landmarks detected")
 		#SECTION -  If u want to see what the robot sees
 		# image_array = np.frombuffer(image, np.uint8)
 		# rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
