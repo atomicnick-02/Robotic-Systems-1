@@ -11,3 +11,5 @@ textFiles: -1
 globalOptionalRendering: DistanceSensorRays::CameraFrustums
 consoles: Console:All:All
 renderingDevicePerspectives: Pioneer 2:camera;1;0.398958;0;0
+renderingDevicePerspectives: rosbot:camera depth;1;1;0;0
+renderingDevicePerspectives: rosbot:camera rgb;1;1;0;0

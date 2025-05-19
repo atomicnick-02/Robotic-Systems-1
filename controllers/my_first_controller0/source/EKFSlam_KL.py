@@ -298,31 +298,70 @@ class EKF_SLAM:
         plt.ylabel('Y Position')
         plt.title('EKF SLAM Landmarks and Robot Pose')
         # plt.legend()
-        # plt.grid()
+        plt.grid()
         # wait for one second and clear the plot
         plt.pause(0.001)
         # Uncomment the following line to show the plot
         
+    def plot_debug_landmarks(self, landmarks, robot_pose):
+        """
+        Plot the landmarks and robot pose.
+
+        Args:
+            landmarks: List of landmark positions (r,phi)
+            robot_pose: Robot pose [x, y, theta]
+        """
         
-       
+        plt.cla()
+        plt.scatter(landmarks[:, 0], landmarks[:, 1], c='r', label='Landmarks')
+        plt.quiver(robot_pose[0], robot_pose[1], np.cos(robot_pose[2]), np.sin(robot_pose[2]), 
+                   angles='xy', scale_units='xy', scale=1, color='b', label='Robot Pose')
+        plt.xlim(-10, 10)
+        plt.ylim(-10, 10)
+        plt.xlabel('X Position')
+        plt.ylabel('Y Position')
+        plt.title('EKF SLAM Landmarks and Robot Pose')
+        # plt.legend()
+        plt.grid()
 # Example usage (not executed when imported)
-# if __name__ == "__main__":
-#     # Initialize SLAM object
-#     slam = EKF_SLAM()
+if __name__ == "__main__":
+    # Initialize SLAM object
+    slam = EKF_SLAM()
     
-#     # Set parameters if needed
-#     slam.set_time_step(0.1)  # 100ms time step
+    # Set parameters if needed
+    slam.set_time_step(0.1)  # 100ms time step
     
-#     # Example control and measurement
-#     u = [1.0, np.deg2rad(5)]  # Move forward at 1m/s with 5deg/s rotation
-#     z = [[5.0, np.deg2rad(30)], [7.0, np.deg2rad(-45)]]  # Two landmark measurements
+    # Example control and measurement
+    u = [0, np.deg2rad(10)]  # Move forward at 1m/s with 5deg/s rotation
+    z = [
+        [5.0, np.deg2rad(0)], 
+        # [7.0, np.deg2rad(-45)], 
+        # [3.0, np.deg2rad(60)], 
+        [2.0, np.deg2rad(-180)]
+         ]
     
-#     # Update SLAM state
-#     robot_pose, landmarks = slam.update(u, z)
+    # Update SLAM state
+    robot_pose, landmarks = slam.update(u, z)
     
-#     # Get results
-#     print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
-#     if landmarks is not None:
-#         print(f"Detected {len(landmarks)} landmarks:")
-#         for i, lm in enumerate(landmarks):
-#             print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+    # Get results
+    print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
+    if landmarks is not None:
+        print(f"Detected {len(landmarks)} landmarks:")
+        for i, lm in enumerate(landmarks):
+            print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+
+    
+    u = [0, np.deg2rad(10)]  # Move forward at 1m/s with 5deg/s rotation
+    
+    # Update SLAM state
+    robot_pose, landmarks = slam.update(u, z)
+    
+    # Get results
+    print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
+    if landmarks is not None:
+        print(f"Detected {len(landmarks)} landmarks:")
+        for i, lm in enumerate(landmarks):
+            print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+    # Plot landmarks and robot pose
+    slam.plot_landmarks(landmarks, robot_pose)
+    plt.show()
