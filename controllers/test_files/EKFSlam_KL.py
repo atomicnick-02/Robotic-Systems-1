@@ -18,9 +18,9 @@ class EKF_SLAM:
         # Initialize state vector with robot pose [x, y, theta]
         self.mu = np.zeros(3)
         # Initialize covariance matrix for initial state
-        self.Sigma = np.eye(3, 3) 
+        self.Sigma = np.eye(3, 3) * 6
         # Default motion noise (can be modified by setter method)
-        self.R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2
+        self.R = np.diag([0.1, 0.1, np.deg2rad(0.1)]) ** 2
         # Default measurement noise (can be modified by setter method)
         self.Q = np.diag([1, np.deg2rad(5)]) ** 2
         # Time increment
@@ -29,7 +29,7 @@ class EKF_SLAM:
         self.thresholds = {0.1: 4.61, 0.05: 5.99, 0.01: 9.21, 0.001: 13.82}
         self.alpha_threshold = self.thresholds[0.001]
         # Minimum distance between landmarks to avoid duplicates
-        self.min_landmark_distance = 0.5
+        self.min_landmark_distance = 0.6
         
     def set_noise_parameters(self, R=None, Q=None):
         """
@@ -109,8 +109,37 @@ class EKF_SLAM:
                                                  self.R, self.Q, self.dt, 
                                                  self.alpha_threshold)
         return self.get_state()
+    
+    @staticmethod
+    def _kl_divergence(mean_p, cov_p, mean_q, cov_q):
+        """
+        Symmetric KL divergence between two Gaussians P ~ N(mean_p, cov_p) and
+        Q ~ N(mean_q, cov_q):
         
-    def _ekf_slam_step(self, mu, Sigma, u, z, R, Q, dt, alpha_threshold):
+           D_sym(P‖Q) = 0.5 [ D(P‖Q) + D(Q‖P) ]
+        """
+        k = mean_p.shape[0]
+        
+        # Calculate D(P‖Q)
+        inv_q = np.linalg.inv(cov_q)
+        delta_pq = mean_q - mean_p
+        term1_pq = np.trace(inv_q @ cov_p)
+        term2_pq = delta_pq.T @ inv_q @ delta_pq
+        term3_pq = np.log(np.linalg.det(cov_q) / np.linalg.det(cov_p))
+        kl_pq = 0.5 * (term1_pq + term2_pq - k + term3_pq)
+        
+        # Calculate D(Q‖P)
+        inv_p = np.linalg.inv(cov_p)
+        delta_qp = mean_p - mean_q
+        term1_qp = np.trace(inv_p @ cov_q)
+        term2_qp = delta_qp.T @ inv_p @ delta_qp
+        term3_qp = np.log(np.linalg.det(cov_p) / np.linalg.det(cov_q))
+        kl_qp = 0.5 * (term1_qp + term2_qp - k + term3_qp)
+        
+        return 0.5 * (kl_pq + kl_qp)
+
+
+    def _ekf_slam_step(self, mu, Sigma, u, z, R, Q, dt, alpha_threshold ):
         """
         Main EKF SLAM algorithm with unknown correspondences.
         
@@ -175,98 +204,81 @@ class EKF_SLAM:
         Sigma_bar = G @ Sigma @ G.T + Fx.T @ R @ Fx
 
         # Process each measurement for update or landmark addition
-        for i in range(len(z)):
-            r_i, phi_i = z[i]  # Range and bearing measurement
+        for (r_i, phi_i) in z:
             z_i = np.array([r_i, phi_i])
-
-            # Variables to keep track of best landmark match
-            min_mahalanobis = float('inf')
+            best_kl = float('inf')
             best_dz = None
             best_H = None
             best_K = None
 
-            # Check all existing landmarks for correspondence
             Nt = (len(mu_bar) - 3) // 2
             for j in range(Nt):
-                # Index of current landmark in state vector
-                lm_index = 3 + 2 * j
-                
-                # Calculate difference between landmark and robot position
-                delta = mu_bar[lm_index:lm_index+2] - mu_bar[0:2]
-                q = delta.T @ delta  # Squared distance
-                sqrt_q = np.sqrt(q)  # Distance
-                
-                # Expected measurement if this landmark is observed
+                idx = 3 + 2*j
+                delta = mu_bar[idx:idx+2] - mu_bar[0:2]
+                q = delta.T @ delta
+                sqrt_q = np.sqrt(q)
+
+                # expected measurement
                 z_hat = np.array([
-                    sqrt_q,  # Expected range
-                    self._wrap_angle(np.arctan2(delta[1], delta[0]) - mu_bar[2])  # Expected bearing
+                    sqrt_q,
+                    self._wrap_angle(np.arctan2(delta[1], delta[0]) - mu_bar[2])
                 ])
-                
-                # Measurement innovation (difference between actual and expected)
-                dz = z_i - z_hat
-                dz[1] = self._wrap_angle(dz[1])  # Normalize angle difference
 
-                # Create matrix to extract relevant state variables
+                # Innovation Jacobian H (same as before)
                 Fxj = np.zeros((5, len(mu_bar)))
-                Fxj[0:3, 0:3] = np.eye(3)  # Robot pose
-                Fxj[3, lm_index] = 1      # Landmark x
-                Fxj[4, lm_index+1] = 1    # Landmark y
+                Fxj[0:3, 0:3] = np.eye(3)
+                Fxj[3, idx]   = 1
+                Fxj[4, idx+1] = 1
 
-                # Jacobian of measurement model
                 H = (1 / q) * np.array([
                     [-sqrt_q * delta[0], -sqrt_q * delta[1], 0, sqrt_q * delta[0], sqrt_q * delta[1]],
-                    [delta[1], -delta[0], -q, -delta[1], delta[0]]
+                    [ delta[1],         -delta[0],        -q, -delta[1],         delta[0]]
                 ]) @ Fxj
 
-                # Innovation covariance
                 S = H @ Sigma_bar @ H.T + Q
-                
-                # Calculate Mahalanobis distance to check correspondence
-                mahalanobis = dz.T @ np.linalg.inv(S) @ dz
 
-                # Keep track of best match
-                if mahalanobis < min_mahalanobis:
-                    min_mahalanobis = mahalanobis
-                    best_dz = dz
-                    best_H = H
-                    best_K = Sigma_bar @ H.T @ np.linalg.inv(S)
+                # compute symmetric KL divergence between:
+                #   P = N(z_hat, S)   and   Q = N(z_i, Q)
+                kl_div = self._kl_divergence(z_hat, S, z_i, Q)
 
-            # If no good match found, create new landmark
-            if min_mahalanobis > alpha_threshold:
-                # Convert polar measurement to global Cartesian coordinates
+                if kl_div < best_kl:
+                    best_kl  = kl_div
+                    best_dz  = z_i - z_hat
+                    best_dz[1] = self._wrap_angle(best_dz[1])
+                    best_H   = H
+                    best_K   = Sigma_bar @ H.T @ np.linalg.inv(S)
+
+            # decide: new landmark if KL too large
+            if best_kl > alpha_threshold:
                 lx = mu_bar[0] + r_i * np.cos(phi_i + mu_bar[2])
                 ly = mu_bar[1] + r_i * np.sin(phi_i + mu_bar[2])
 
-                # Check if the new landmark is too close to existing ones
+                # check proximity to existing
                 too_close = False
-                for j in range((len(mu_bar) - 3) // 2):
-                    idx = 3 + 2*j
-                    existing_lx = mu_bar[idx]
-                    existing_ly = mu_bar[idx+1]
-                    dist = np.hypot(existing_lx - lx, existing_ly - ly)
-                    if dist < self.min_landmark_distance:
+                for j in range((len(mu_bar)-3)//2):
+                    ex, ey = mu_bar[3+2*j:3+2*j+2]
+                    if np.hypot(ex-lx, ey-ly) < self.min_landmark_distance:
                         too_close = True
                         break
 
-                # Add new landmark if not too close to existing ones
                 if not too_close:
-                    # Extend state vector with new landmark
-                    mu_bar = np.append(mu_bar, [lx, ly])
-                    
-                    # Extend covariance matrix
-                    new_Sigma = np.zeros((len(mu_bar), len(mu_bar)))
-                    new_Sigma[:Sigma_bar.shape[0], :Sigma_bar.shape[1]] = Sigma_bar
-                    new_Sigma[-2:, -2:] = np.diag([1, 1])  # Initial landmark uncertainty
-                    Sigma_bar = new_Sigma
+                    # append landmark
+                    mu_bar = np.hstack([mu_bar, [lx, ly]])
+                    new_S = np.zeros((len(mu_bar), len(mu_bar)))
+                    old_n = Sigma_bar.shape[0]
+                    new_S[:old_n, :old_n] = Sigma_bar
+                    new_S[-2:, -2:] = np.eye(2)  # initial high uncertainty
+                    Sigma_bar = new_S
 
-            # Update state with matched landmark
             else:
-                # Kalman update equations
-                mu_bar = mu_bar + best_K @ best_dz
-                mu_bar[2] = self._wrap_angle(mu_bar[2])  # Normalize robot heading
+                # standard EKF update
+                mu_bar    = mu_bar + best_K @ best_dz
+                mu_bar[2] = self._wrap_angle(mu_bar[2])
                 Sigma_bar = (np.eye(len(mu_bar)) - best_K @ best_H) @ Sigma_bar
 
         return mu_bar, Sigma_bar
+    
+    
     def plot_landmarks(self, landmarks,robot_pose):
         """
         Plot the landmarks and robot pose.
@@ -286,30 +298,74 @@ class EKF_SLAM:
         plt.ylabel('Y Position')
         plt.title('EKF SLAM Landmarks and Robot Pose')
         # plt.legend()
-        # plt.grid()
+        plt.grid()
         # wait for one second and clear the plot
         plt.pause(0.001)
         # Uncomment the following line to show the plot
         
+    def plot_debug_landmarks(self, landmarks, robot_pose_real, detected_landmarks = None , robot_pose_est = None):
+        """
+        Plot the landmarks and robot pose.
 
-# # Example usage (not executed when imported)
-# if __name__ == "__main__":
-#     # Initialize SLAM object
-#     slam = EKF_SLAM()
+        Args:
+            landmarks: List of landmark positions (r,phi)
+            robot_pose: Robot pose [x, y, theta]
+        """
+        
+        plt.cla()
+        plt.quiver(robot_pose_real[0], robot_pose_real[1], np.cos(robot_pose_real[2]), np.sin(robot_pose_real[2]), 
+                   angles='xy', scale_units='xy', scale=1, color='b', label='Robot Pose Real')
+        plt.quiver(robot_pose_est[0], robot_pose_est[1], np.cos(robot_pose_est[2]), np.sin(robot_pose_est[2]), 
+                   angles='xy', scale_units='xy', scale=1, color='y', label='Robot Pose Estimate')
+        
+        plt.scatter(landmarks[:, 0], landmarks[:, 1], c='r', label='Landmarks')
+        plt.scatter(detected_landmarks[:, 0], detected_landmarks[:, 1], c='g', label='Detected Landmarks')
+        plt.xlim(-10, 10)
+        plt.ylim(-10, 10)
+        plt.xlabel('X Position')
+        plt.ylabel('Y Position')
+        plt.title('EKF SLAM Landmarks and Robot Pose')
+        # plt.legend()
+        plt.grid()
+# Example usage (not executed when imported)
+if __name__ == "__main__":
+    # Initialize SLAM object
+    slam = EKF_SLAM()
     
-#     # Set parameters if needed
-#     slam.set_time_step(0.1)  # 100ms time step
+    # Set parameters if needed
+    slam.set_time_step(0.1)  # 100ms time step
     
-#     # Example control and measurement
-#     u = [1.0, np.deg2rad(5)]  # Move forward at 1m/s with 5deg/s rotation
-#     z = [[5.0, np.deg2rad(30)], [7.0, np.deg2rad(-45)]]  # Two landmark measurements
+    # Example control and measurement
+    u = [0, np.deg2rad(10)]  # Move forward at 1m/s with 5deg/s rotation
+    z = [
+        [5.0, np.deg2rad(0)], 
+        # [7.0, np.deg2rad(-45)], 
+        # [3.0, np.deg2rad(60)], 
+        [2.0, np.deg2rad(-180)]
+         ]
     
-#     # Update SLAM state
-#     robot_pose, landmarks = slam.update(u, z)
+    # Update SLAM state
+    robot_pose, landmarks = slam.update(u, z)
     
-#     # Get results
-#     print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
-#     if landmarks is not None:
-#         print(f"Detected {len(landmarks)} landmarks:")
-#         for i, lm in enumerate(landmarks):
-#             print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+    # Get results
+    print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
+    if landmarks is not None:
+        print(f"Detected {len(landmarks)} landmarks:")
+        for i, lm in enumerate(landmarks):
+            print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+
+    
+    u = [0, np.deg2rad(10)]  # Move forward at 1m/s with 5deg/s rotation
+    
+    # Update SLAM state
+    robot_pose, landmarks = slam.update(u, z)
+    
+    # Get results
+    print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
+    if landmarks is not None:
+        print(f"Detected {len(landmarks)} landmarks:")
+        for i, lm in enumerate(landmarks):
+            print(f"  Landmark {i+1}: ({lm[0]:.2f}, {lm[1]:.2f})")
+    # Plot landmarks and robot pose
+    slam.plot_landmarks(landmarks, robot_pose)
+    plt.show()
