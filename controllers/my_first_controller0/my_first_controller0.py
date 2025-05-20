@@ -1,10 +1,8 @@
 from controller import Robot
 from source.Odometry import Odometry
 import numpy as np
-import matplotlib as plt
 from source.ApriltagDetector import AprilTagDetector
 from source.EKFSlam  import EKF_SLAM
-import cv2
 
 np.set_printoptions(suppress=True, precision=5)
 
@@ -84,14 +82,15 @@ while robot.step(TIME_STEP) != -1:
 	#SECTION -  Read Camera and position from wheels
 	image = camera_rgb.getImage() # Get AprilTags Positions from camera
 	enc_vals = [rl_ps.getValue(), rr_ps.getValue()]
-	print(f"encoders: {enc_vals[0]:.2f} {enc_vals[1]:.2f}", end= " ")
+	# print(f"encoders: {enc_vals[0]:.2f} {enc_vals[1]:.2f}", end= " ")
 	res = april_detector.detect(image)
 	pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 	r_phi_dict = odometry.transform_aruco_to_world(res)
 	
 	u = odometry.get_velocity()
-	robot_pose, landmarks = ekf_slam.update(u, r_phi_dict)
-	print(f"robot pose encoders{pose}, ekf: {robot_pose} diff: {np.linalg.norm(robot_pose - pose):.2f}")
+	ekf_slam.update(u, r_phi_dict)
+	robot_pose, landmarks = ekf_slam.get_state()
+	print(f"robot pose encoders {pose}, ekf: {robot_pose}")
 	# try:
 	# 	print(f"landmarks: {len(landmarks)}\n{landmarks}")
 	# 	error = (pose - robot_pose)/robot_pose *100

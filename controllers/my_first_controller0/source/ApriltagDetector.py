@@ -81,5 +81,5 @@ class AprilTagDetector:
         	    tvec_list,
     	        key=lambda t: np.linalg.norm(t)
         	)
-		print(tag_locations)
+		# print(tag_locations)
 		return tag_locations
