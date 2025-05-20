@@ -64,7 +64,6 @@ def lidar(x, landmarks, width = 2. * np.pi, noise = 1e-3):
     return detects
 
 def main():
-	# Initialize the robot
 	slam = EKF_SLAM()
 	
 	# Set parameters if needed
@@ -87,10 +86,10 @@ def main():
 
 		real_trajectory[t] = robot_move(u, robot_pose, 0.2)
 		landmark_readings =  [] 
-
+		z = None
 
 		estimated_trajectory[t] = robot_pose
-		robot_pose, landmarks = slam.update(u, )
+		robot_pose, landmarks = slam.update(u, z)
 		
 		# Print the robot pose and detected landmarks
 		print(f"Robot pose: x={robot_pose[0]:.2f}, y={robot_pose[1]:.2f}, θ={np.rad2deg(robot_pose[2]):.2f}°")
