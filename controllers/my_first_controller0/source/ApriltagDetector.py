@@ -69,7 +69,7 @@ class AprilTagDetector:
 			tag_id = tag.tag_id
 			# rotate the translation vector
 			tvec = tag.pose_t
-			tvec = np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]]) @ tvec
+			tvec = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ tvec
 			if tag_id not in tag_locations:
 				tag_locations[tag_id] = [tvec]
 			else:
@@ -80,4 +80,5 @@ class AprilTagDetector:
         	    tvec_list,
     	        key=lambda t: np.linalg.norm(t)
         	)
+		print(tag_locations)
 		return tag_locations

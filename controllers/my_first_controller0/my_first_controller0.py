@@ -76,7 +76,7 @@ april_detector = AprilTagDetector(camera_rgb,robot)
 while robot.step(TIME_STEP) != -1:
 	# Read accelerometer
 	a = accelerometer.getValues()
-	print(f"accelerometer values = {a[0]:.2f} {a[1]:.2f} {a[2]:.2f}", end= " ")
+	# print(f"accelerometer values = {a[0]:.2f} {a[1]:.2f} {a[2]:.2f}", end= " ")
 
 	# Read distance sensor values
 	distances = [ds.getValue() for ds in distance_sensors]
@@ -84,23 +84,24 @@ while robot.step(TIME_STEP) != -1:
 	#SECTION -  Read Camera and position from wheels
 	image = camera_rgb.getImage() # Get AprilTags Positions from camera
 	enc_vals = [rl_ps.getValue(), rr_ps.getValue()]
-	
+	print(f"encoders: {enc_vals[0]:.2f} {enc_vals[1]:.2f}", end= " ")
 	res = april_detector.detect(image)
 	pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 	r_phi_dict = odometry.transform_aruco_to_world(res)
 	
 	u = odometry.get_velocity()
-	robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) 
-	print(f"robot pose ekf{robot_pose}")
-	try:
-		print(f"landmarks: {len(landmarks)}\n{landmarks}")
-		error = (pose - robot_pose)/robot_pose *100
-		print(error)
+	robot_pose, landmarks = ekf_slam.update(u, r_phi_dict)
+	print(f"robot pose encoders{pose}, ekf: {robot_pose} diff: {np.linalg.norm(robot_pose - pose):.2f}")
+	# try:
+	# 	print(f"landmarks: {len(landmarks)}\n{landmarks}")
+	# 	error = (pose - robot_pose)/robot_pose *100
+	# 	print(error)
 		
-		print("-"*20)
-		# ekf_slam.plot_landmarks(landmarks, robot_pose)
-	except:
-		print("No landmarks detected")
+	# 	print("-"*20)
+	# 	# ekf_slam.plot_landmarks(landmarks, robot_pose)
+	# except:
+		# print("No landmarks detected")
+
 	# image_array = np.frombuffer(image, np.uint8)
 	# rgb_image = image_array.reshape((camera_rgb.getHeight(), camera_rgb.getWidth(), 4))
 	# gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
