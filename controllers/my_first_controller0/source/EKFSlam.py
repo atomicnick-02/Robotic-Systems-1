@@ -45,28 +45,33 @@ class EKF_SLAM:
     def get_covariance(self):
         return self.hypotheses[0].Sigma.copy()
 
-    def update(self, u, z):
+    def predict(self, u):
         new_hypotheses = []
         for hyp in self.hypotheses:
             mu_bar, Sigma_bar = self._motion_update(hyp.mu, hyp.Sigma, u)
+            new_hypotheses.append(self.Hypothesis(mu_bar, Sigma_bar, hyp.score))
+        self.hypotheses = new_hypotheses
+
+    def correct(self, z):
+        new_hypotheses = []
+        for hyp in self.hypotheses:
             for zi in z:
-                associations = self._associate(mu_bar, Sigma_bar, zi)
+                associations = self._associate(hyp.mu, hyp.Sigma, zi)
                 if not associations:
-                    mu_new, Sigma_new = self._add_new_landmark(mu_bar, Sigma_bar, zi)
+                    mu_new, Sigma_new = self._add_new_landmark(hyp.mu, hyp.Sigma, zi)
                     new_hypotheses.append(self.Hypothesis(mu_new, Sigma_new, hyp.score))
                 else:
                     for j, dz, H, K, maha in associations:
-                        mu_new = mu_bar + K @ dz
+                        mu_new = hyp.mu + K @ dz
                         mu_new[2] = self.wrap_angle(mu_new[2])
-                        Sigma_new = (np.eye(len(mu_bar)) - K @ H) @ Sigma_bar
+                        Sigma_new = (np.eye(len(mu_new)) - K @ H) @ hyp.Sigma
                         score = hyp.score - maha
                         new_hypotheses.append(self.Hypothesis(mu_new, Sigma_new, score))
 
         self.hypotheses = sorted(new_hypotheses, key=lambda h: h.score, reverse=True)[:self.max_hypotheses]
-
         best = self.hypotheses[0]
         best.mu, best.Sigma = self._merge_close_landmarks(best.mu, best.Sigma, self.min_landmark_distance)
-        # return best.mu, best.Sigma
+
 
     def _motion_update(self, mu, Sigma, u):
         v, w = u

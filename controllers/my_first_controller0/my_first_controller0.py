@@ -88,7 +88,10 @@ while robot.step(TIME_STEP) != -1:
 	r_phi_dict = odometry.transform_aruco_to_world(res)
 	
 	u = odometry.get_velocity()
-	ekf_slam.update(u, r_phi_dict)
+	ekf_slam.predict(u)
+	if r_phi_dict:
+		ekf_slam.correct(r_phi_dict)
+	
 	robot_pose, landmarks = ekf_slam.get_state()
 	print(f"robot pose encoders {pose}, ekf: {robot_pose}")
 	# try:
