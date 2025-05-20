@@ -14,8 +14,8 @@ class Odometry:
         Pose is [x, y, theta], and velocity [v, w].
         """
         # Robot parameters
-        self.wheel_radius   = 0.0825    # m
-        self.wheel_distance = 0.331     # m between wheels
+        self.wheel_radius   = 0.042     # m
+        self.wheel_distance = 0.194     # m between wheels
         
         # Time step (s)
         self.dt = robot.getBasicTimeStep() / 1000.0

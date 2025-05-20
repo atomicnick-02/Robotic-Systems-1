@@ -10,6 +10,6 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: DistanceSensorRays::CameraFrustums
 consoles: Console:All:All
-renderingDevicePerspectives: rosbot:astra_camera depth;1;1;0;0
-renderingDevicePerspectives: rosbot:astra_camera rgb;1;1;0;0
-renderingDevicePerspectives: rosbot:camera;1;0.552778;0;0
+renderingDevicePerspectives: rosbot:astra_camera depth;1;0.895833;0;0
+renderingDevicePerspectives: rosbot:astra_camera rgb;1;0.895833;0;0
+renderingDevicePerspectives: rosbot:camera;1;0.398958;0;0

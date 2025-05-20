@@ -15,8 +15,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.1281812905488641 0.16796004624065028 0.9774246669795408 1.325859108303549
-  position -1.227745140185715 -1.3159037255912003 0.493692298236533
+  orientation 0.024214856539240888 0.7300787449721291 -0.6829338671223626 0.09693909723310344
+  position -2.860261220328654 -0.15903133394921803 0.4175655420596732
   followType "Mounted Shot"
 }
 TexturedBackground {
@@ -32,7 +32,6 @@ RectangleArena {
   wallHeight 1
 }
 Robot {
-  translation -0.98 0 0
   children [
     DEF MAIN_BODY Pose {
       translation 0 0 0.023
@@ -429,6 +428,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position -2.835672533126922e-08
         axis 0 1 0
         anchor 0.05 0.11 0.043
         dampingConstant 5
@@ -446,6 +446,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 0.11 0.043
+        rotation 0 -0.9999999999999999 0 2.9802322387695313e-08
         children [
           Pose {
             children [
@@ -493,6 +494,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position -5.6659438514728573e-08
         axis 0 1 0
         anchor 0.05 -0.11 0.043
         dampingConstant 5
@@ -510,6 +512,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 -0.11 0.043
+        rotation 0 -0.9999999999999999 0 5.960464477539063e-08
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -531,6 +534,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position -2.828308029427691e-08
         axis 0 1 0
         anchor -0.055 0.11 0.043
         dampingConstant 5
@@ -548,6 +552,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 0.11 0.043
+        rotation 0 -0.9999999999999999 0 2.9802322387695313e-08
         children [
           Pose {
             children [
@@ -562,6 +567,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position -5.6308276751746226e-08
         axis 0 1 0
         anchor -0.055 -0.11 0.043
         dampingConstant 5
@@ -579,6 +585,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 -0.11 0.043
+        rotation 0 -1 0 5.960464477539063e-08
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -661,6 +668,7 @@ Robot {
       translation -0.027 0 0.165
       children [
         Camera {
+          translation 0.027 0.01 0.034
           fieldOfView 1.5708
           width 1920
           height 1080
@@ -726,6 +734,7 @@ Robot {
     density -1
     mass 0.45
   }
+  controller "my_first_controller0"
 }
 Group {
   children [

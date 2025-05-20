@@ -149,7 +149,7 @@ def run():
 		u = odometry.get_velocity()
 		
 		# FIXME - ROBOT POSE GETS WRONG ESTIMATE
-		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
+		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) 
 		print(f"robot pose ekf{robot_pose}")
 		try:
 			print(f"landmarks: {len(landmarks)}\n{landmarks}")
