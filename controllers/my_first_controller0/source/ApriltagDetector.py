@@ -26,9 +26,11 @@ class AprilTagDetector:
 		self.detector = dt_apriltags.Detector(
 			families='tag36h11',
 			nthreads=4,
-			quad_decimate=1,
-			refine_edges=1,
-			quad_sigma=0.0,
+			quad_decimate=1.0,  # Reduced from default to process full resolution
+			quad_sigma=0.8,     # Increased Gaussian blur for better edge detection
+			refine_edges=True,  # Enable edge refinement
+			decode_sharpening=0.25,  # Add sharpening to improve decoding
+			debug=False
 		)
 		
 		# Storage for detected AprilTags
@@ -52,15 +54,14 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 980.0759635135262, 905.8307238786748
-		cx, cy = 947.5093360979839, 456.48596691757916
-
+		fx, fy = 2180.821770876292, 2022.5541555343623
+		cx, cy = 971.9235543445766, 537.3153526641415
 		camera_matrix = np.array([[fx, 0, cx],
 								  [0, fy, cy],
 								  [0, 0, 1]], dtype=np.float32)
 		
 		camera_matrix = [fx, fy, cx, cy]
-		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.1024) # 0.48
+		tags = self.detector.detect(gray, estimate_tag_pose=True, camera_params=camera_matrix, tag_size=0.128) # 0.48
 		
 		# sort the tags based on location
 		# Store detected tag locations

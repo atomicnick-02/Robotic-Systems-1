@@ -15,8 +15,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.07523391462771091 0.34977044739491203 0.9338096659485556 0.452822985370842
-  position 0.009257190734149656 -1.8671471359702656 0.6974833833658391
+  orientation 0.18515367618781856 0.7628120779877587 -0.6195448731691143 0.7467846294230724
+  position -3.5990806918271487 1.99831386853569 3.934716649954543
   followType "Mounted Shot"
 }
 TexturedBackground {
@@ -32,7 +32,8 @@ RectangleArena {
   wallHeight 1
 }
 Robot {
-  translation 0 0 -0.000562588
+  translation 0 0 -0.000593862
+  rotation -0.00029807747862047864 0.9999999538440566 -5.8836226429141926e-05 0.00039403703354529346
   children [
     DEF MAIN_BODY Pose {
       translation 0 0 0.023
@@ -429,6 +430,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position 3.0623385426557355
         axis 0 1 0
         anchor 0.05 0.11 0.043
         dampingConstant 5
@@ -446,7 +448,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 0.11 0.043
-        rotation 0 1 0 0
+        rotation 0 1 0 3.0623385426557355
         children [
           Pose {
             children [
@@ -494,6 +496,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position 3.062338542538623
         axis 0 1 0
         anchor 0.05 -0.11 0.043
         dampingConstant 5
@@ -511,7 +514,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 -0.11 0.043
-        rotation 0 1 0 0
+        rotation 0 1 0 3.062338542538623
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -533,6 +536,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position 3.062338326638514
         axis 0 1 0
         anchor -0.055 0.11 0.043
         dampingConstant 5
@@ -550,7 +554,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 0.11 0.043
-        rotation 0 1 0 0
+        rotation 0 1 0 3.062338326638514
         children [
           Pose {
             children [
@@ -565,6 +569,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
+        position 3.0623383265137663
         axis 0 1 0
         anchor -0.055 -0.11 0.043
         dampingConstant 5
@@ -582,7 +587,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 -0.11 0.043
-        rotation 0 1 0 0
+        rotation 0 1 0 3.0623383265137663
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -809,6 +814,74 @@ Group {
             baseColorMap ImageTexture {
               url [
                 "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 3.72661 -0.00438134 0.3
+      rotation 0 0 1 3.14
+      scale 0.001 0.297 0.21
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../../../../../Downloads/Checkerboard-A4-25mm-10x7.png"
               ]
               filtering 0
             }
