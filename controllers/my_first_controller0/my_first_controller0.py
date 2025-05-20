@@ -5,197 +5,88 @@ import matplotlib as plt
 from source.ApriltagDetector import AprilTagDetector
 from source.EKFSlam_KL  import EKF_SLAM
 
-np.set_printoptions(suppress=True, precision=4)
 # Constants
-MAX_SENSOR_NUMBER = 16
-RANGE = 1024 / 2
+TIME_STEP = 32
+MAX_VELOCITY = 26.0
+BASE_SPEED = 6.0
 
-# Helper to clamp values
-def bound(x, a, b):
-	return a if x < a else b if x > b else x
+# Empirical collision avoidance coefficients
+COEFFICIENTS = [[15.0, -9.0],
+                [-15.0, 9.0]]
 
-def initialize(robot) -> dict:
-	"""
-	Initialize devices, sensors, motors, and Braitenberg weights.
-	Returns a dict with all handles and parameters.
-	"""
-	# Basic timestep
-	time_step = int(robot.getBasicTimeStep())
-	# Robot name
-	robot_name = robot.getName()
+# Initialize the robot instance
+robot = Robot()
 
-	# Default parameters
-	camera_enabled = True
-	range_val = RANGE
-	max_speed = 1.0
-	speed_unit = 1.0
+# Initialize motors
+front_left_motor = robot.getDevice('fl_wheel_joint')
+front_right_motor = robot.getDevice('fr_wheel_joint')
+rear_left_motor = robot.getDevice('rl_wheel_joint')
+rear_right_motor = robot.getDevice('rr_wheel_joint')
+for motor in (front_left_motor, front_right_motor, rear_left_motor, rear_right_motor):
+    motor.setPosition(float('inf'))
+    motor.setVelocity(0.0)
 
-	# Weight matrices for various robots
-	
-	pioneer2_matrix = [
-		[-1, 15], [-3, 13], [-3, 8], [-2, 7],
-		[-3, -4], [-4, -2], [-3, -2], [-1, -1],
-		[-1, -1], [-2, -3], [-2, -4], [4, -3],
-		[7, -5], [7, -3], [10, -2], [11, -1]
-	]
-	
+# Initialize position sensors
+fl_ps = robot.getDevice('front left wheel motor sensor')
+fr_ps = robot.getDevice('front right wheel motor sensor')
+rl_ps = robot.getDevice('rear left wheel motor sensor')
+rr_ps = robot.getDevice('rear right wheel motor sensor')
+for ps in (fl_ps, fr_ps, rl_ps, rr_ps):
+    ps.enable(TIME_STEP)
 
-	# Determine robot type and parameters
+# Initialize RGB and depth cameras
+camera_rgb = robot.getDevice('camera')
+camera_rgb.enable(TIME_STEP)
 
-	if robot_name == "Pioneer 2":
-		num_sensors = 16
-		sensor_prefix = "ds"
-		weights = pioneer2_matrix
-		cal_sesnor_prefix = "cal_ds"
-		max_speed = 5.0 # Angular speed
-		speed_unit = 0.4
-	else:
-		print("This controller doesn't support robot:", robot_name)
-		exit(1)
+# Initialize lidar
+lidar = robot.getDevice('laser')
+lidar.enable(TIME_STEP)
+lidar.enablePointCloud()
 
-	# Initialize sensors
-	sensors = []
-	for i in range(num_sensors):
-		name = f"{sensor_prefix}{i}"
-		ds = robot.getDevice(name)
-		ds.enable(time_step)
-		sensors.append(ds)
+# Initialize IMU sensors
+accelerometer = robot.getDevice('imu accelerometer')
+gyro = robot.getDevice('imu gyro')
+compass = robot.getDevice('imu compass')
+accelerometer.enable(TIME_STEP)
+gyro.enable(TIME_STEP)
+compass.enable(TIME_STEP)
 
-	# Initialize calibration sensor
-	cal_ds = robot.getDevice(f"{cal_sesnor_prefix}")
-	cal_ds.enable(time_step)
+# Initialize distance sensors
+ds_names = ['fl_range', 'rl_range', 'fr_range', 'rr_range']
+distance_sensors = []
+for name in ds_names:
+    ds = robot.getDevice(name)
+    ds.enable(TIME_STEP)
+    distance_sensors.append(ds)
+    
 
-	# Initialize motors
-	left_motor = robot.getDevice("left wheel motor")
-	right_motor = robot.getDevice("right wheel motor")
-	left_motor.setPosition(float('inf'))
-	right_motor.setPosition(float('inf'))
-	left_motor.setVelocity(0.0)
-	right_motor.setVelocity(0.0)
-	# Initialize encoders
-	left_encoder = robot.getDevice("left wheel sensor")
-	right_encoder = robot.getDevice("right wheel sensor")
-	left_encoder.enable(time_step)
-	right_encoder.enable(time_step)
+# Initialize odometry
+odometry = Odometry(robot)
 
+# Initialize EKF_SLAM
+ekf_slam = EKF_SLAM()
 
-	# Initialize camera if present
-	cam = None
-	if camera_enabled:
-		cam = robot.getDevice("camera")
-		cam.enable(time_step)
-		print(f"Camera enabled with FOV: {cam.getFov()} rad")
+# Main control loop
+while robot.step(TIME_STEP) != -1:
+    # Read accelerometer
+    a = accelerometer.getValues()
+    print(f"accelerometer values = {a[0]:.2f} {a[1]:.2f} {a[2]:.2f}")
 
+    # Read distance sensor values
+    distances = [ds.getValue() for ds in distance_sensors]
 
-	return {
-		'time_step': time_step,
-		'sensors': sensors,
-		'weights': weights,
-		'range': range_val,
-		'max_speed': max_speed,
-		'speed_unit': speed_unit,
-		'left_motor': left_motor,
-		'right_motor': right_motor,
-		'left_encoder': left_encoder,
-		'right_encoder': right_encoder,
-		'camera': cam,
-		'cal_ds': cal_ds,
-		'position': np.array([[0.],[0.] , [0.]])
+    # Compute avoidance-based motor speeds
+    avoidance = [0.0, 0.0]
+    speeds = [0.0, 0.0]
+    for i in (0, 1):
+        for j in (1, 2):  # front-left and front-right sensors
+            delta = 2.0 - distances[j]
+            avoidance[i] += delta * delta * COEFFICIENTS[i][j-1]
+        raw_speed = BASE_SPEED + avoidance[i]
+        speeds[i] = min(raw_speed, MAX_VELOCITY)
 
-	}
-
-
-def run():
-	robot = Robot()
-	ctx = initialize(robot)
-	# Initialize odometry
-	odometry = Odometry(robot)
-	
-	# Initialize EKF_SLAM
-	ekf_slam = EKF_SLAM()
-	# ekf_slam.set_time_step(0.01)  # 10ms time step
-
-	# robot.step(ctx['time_step'])
-	# enc_vals = [ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue()]		
-	# pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
-
-	
-	# Initialize AprilTag detector
-	if ctx['camera']:
-		print("focal length:", ctx['camera'].getFocalLength())
-		ctx['AprilTagDetector'] = AprilTagDetector(ctx['camera'], robot)
-		print("#                     AprilTagDetector initialized.              #")
-		
-	print("Starting main loop...")
-	while robot.step(ctx['time_step']) != -1:
-		
-		# SECTION - Measurements	
-		image = ctx['camera'].getImage() # Get AprilTags Positions from camera
-		readings = [ds.getValue() for ds in ctx['sensors']] #get distance sensor values
-		cal_sensor_val = ctx['cal_ds'].getValue()
-		enc_vals = [ctx['left_encoder'].getValue(), ctx['right_encoder'].getValue()]
-
-		# !SECTION - Measurements
-		
-		res = ctx['AprilTagDetector'].detect(image)
-		pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
-		ctx['position'] = pose
-
-		# print(f"Odometry pose: x={pose[0]:.3f}, y={pose[1]:.3f}, θ={pose[2]:.3f}", end=' ')
-
-		r_phi_dict = odometry.transform_aruco_to_world(res)
-		print(f"position:{ctx['position'].T}",end=' ')
-
-		u = odometry.get_velocity()
-		
-		# FIXME - ROBOT POSE GETS WRONG ESTIMATE
-		robot_pose, landmarks = ekf_slam.update(u, r_phi_dict) #TODO: Why does this output only one landmark?
-		print(f"robot pose ekf{robot_pose}")
-		try:
-			print(f"landmarks: {len(landmarks)}\n{landmarks}")
-			error = (pose - robot_pose)/robot_pose *100
-			print(error)
-			
-			print("-"*20)
-			ekf_slam.plot_landmarks(landmarks, ctx['position'])
-		except:
-			print("No landmarks detected")
-		#SECTION -  If u want to see what the robot sees
-		# image_array = np.frombuffer(image, np.uint8)
-		# rgb_image = image_array.reshape((ctx['camera'].getHeight(), ctx['camera'].getWidth(), 4))
-		# gray = cv2.cvtColor(rgb_image, cv2.COLOR_BGRA2GRAY)
-		# cv2.imshow('image', gray)
-		# cv2.waitKey(900)
-		# cv2.destroyAllWindows()
-		# timestep = str(robot.getTime())
-		# print(timestep[2:])
-		# cv2.imwrite(f'img{timestep[2:]}.png', gray)
-		#!SECTION
-
-		# SECTION - Motor Actions
-		speed_l = 0.0
-		speed_r = 0.0
-		for i, val in enumerate(readings):
-			factor = 1.0 - (val / ctx['range'])
-			speed_l += ctx['speed_unit'] * ctx['weights'][i][0] * factor
-			speed_r += ctx['speed_unit'] * ctx['weights'][i][1] * factor
-			# speed_l += 10
-			# speed_r += 10
-		# Clamp
-		speed_l = bound(speed_l, -ctx['max_speed'], ctx['max_speed'])
-		speed_r = bound(speed_r, -ctx['max_speed'], ctx['max_speed'])
-
-		# Set velocities
-		ctx['left_motor'].setVelocity(speed_l)
-		ctx['right_motor'].setVelocity(speed_r)
-		# !SECTION - Motor Actions
-
-		
-		# SECTION - After Actions
-		# Update the last encoder values
-
-
-
-if __name__ == "__main__":
-	run()
-
+    # Apply speeds
+    front_left_motor.setVelocity(speeds[0])
+    rear_left_motor.setVelocity(speeds[0])
+    front_right_motor.setVelocity(speeds[1])
+    rear_right_motor.setVelocity(speeds[1])
