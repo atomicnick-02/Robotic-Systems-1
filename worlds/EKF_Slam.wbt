@@ -13,6 +13,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/orbbec/protos/Astra.proto"
 
 WorldInfo {
+  basicTimeStep 10
 }
 Viewpoint {
   orientation 0.18515367618781856 0.7628120779877587 -0.6195448731691143 0.7467846294230724
@@ -32,8 +33,7 @@ RectangleArena {
   wallHeight 1
 }
 Robot {
-  translation 0 0 -0.000593862
-  rotation -0.00029807747862047864 0.9999999538440566 -5.8836226429141926e-05 0.00039403703354529346
+  translation 0 0 -0.000347453
   children [
     DEF MAIN_BODY Pose {
       translation 0 0 0.023
@@ -430,11 +430,9 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3.0623385426557355
         axis 0 1 0
         anchor 0.05 0.11 0.043
         dampingConstant 5
-        staticFriction 1
       }
       device [
         RotationalMotor {
@@ -448,7 +446,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 0.11 0.043
-        rotation 0 1 0 3.0623385426557355
+        rotation 0 1 0 0
         children [
           Pose {
             children [
@@ -496,11 +494,9 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3.062338542538623
         axis 0 1 0
         anchor 0.05 -0.11 0.043
         dampingConstant 5
-        staticFriction 1
       }
       device [
         RotationalMotor {
@@ -514,7 +510,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 -0.11 0.043
-        rotation 0 1 0 3.062338542538623
+        rotation 0 1 0 0
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -536,11 +532,9 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3.062338326638514
         axis 0 1 0
         anchor -0.055 0.11 0.043
         dampingConstant 5
-        staticFriction 1
       }
       device [
         RotationalMotor {
@@ -554,7 +548,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 0.11 0.043
-        rotation 0 1 0 3.062338326638514
+        rotation 0 1 0 0
         children [
           Pose {
             children [
@@ -569,11 +563,9 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 3.0623383265137663
         axis 0 1 0
         anchor -0.055 -0.11 0.043
         dampingConstant 5
-        staticFriction 1
       }
       device [
         RotationalMotor {
@@ -587,7 +579,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 -0.11 0.043
-        rotation 0 1 0 3.0623383265137663
+        rotation 0 1 0 0
         children [
           Pose {
             rotation 0 0 1 3.141592

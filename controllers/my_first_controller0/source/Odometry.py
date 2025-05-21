@@ -3,11 +3,11 @@ import numpy as np
 
 def angle_normalize(angle):
 	"""Normalize angle to be within -π to π."""
+
 	return (angle + np.pi) % (2 * np.pi) - np.pi
-def encoder_to_angle(ticks):
-	"""Convert encoder value to angle in radians."""
-	ticks_per_revolution = 6.3
-	return ticks * 2*np.pi / ticks_per_revolution
+
+
+
 class Odometry:
 	def __init__(self, robot):
 		"""
@@ -16,7 +16,7 @@ class Odometry:
 		"""
 		# Robot parameters
 		self.wheel_radius   = 0.043     # m
-		self.wheel_distance = 0.194     # m between wheels
+		self.wheel_distance = 0.195     # m between wheels
 		
 		# Time step (s)
 		self.dt = robot.getBasicTimeStep() / 1000.0
@@ -47,8 +47,8 @@ class Odometry:
 		delta_ticks = enc - self.prev_enc
 
 		# 2) Convert to wheel rotation angles (rad)
-		dphi_L = encoder_to_angle(delta_ticks[0])
-		dphi_R = encoder_to_angle(delta_ticks[1])
+		dphi_L = delta_ticks[0]
+		dphi_R = delta_ticks[1]
 
 		# 3) Compute linear distances traveled by each wheel (m)
 		dL = dphi_L * self.wheel_radius
@@ -69,6 +69,7 @@ class Odometry:
 		# 6) Compute velocities (divide distance by dt)
 		v = d_center / self.dt
 		w = d_theta / self.dt
+		print(f"v: {v:.4f} m/s, w: {w:.4f} rad/s")
 		self.velocity = np.array([v, w])
 
 		# 7) Save for next iteration
@@ -93,13 +94,16 @@ class Odometry:
 		Returns:
 			Tuple of (left_angular_velocity, right_angular_velocity)
 		"""
-		encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_encoder_values
+		if self.prev_enc is None:
+			self.prev_enc = np.array([left_encoder, right_encoder])
+			return 0.0, 0.0
+		encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_enc
 		
 		# Calculate angular velocities
 		angular_velocities = encoder_diff / self.dt
 		
 		# Update previous encoder values
-		self.prev_encoder_values = np.array([left_encoder, right_encoder])
+		self.prev_enc = np.array([left_encoder, right_encoder])
 		
 		return tuple(angular_velocities)
 	

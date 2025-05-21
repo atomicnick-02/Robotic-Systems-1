@@ -81,8 +81,9 @@ while robot.step(TIME_STEP) != -1:
 
 	#SECTION -  Read Camera and position from wheels
 	image = camera_rgb.getImage() # Get AprilTags Positions from camera
+
 	enc_vals = [rl_ps.getValue(), rr_ps.getValue()]
-	# print(f"encoders: {enc_vals[0]:.2f} {enc_vals[1]:.2f}", end= " ")
+	print(f"encoders: {enc_vals[0]:.2f} {enc_vals[1]:.2f}", end= " ")
 	res = april_detector.detect(image)
 	pose, u = odometry.update_from_encoders(enc_vals[0], enc_vals[1])
 	r_phi_dict = odometry.transform_aruco_to_world(res)
@@ -93,16 +94,16 @@ while robot.step(TIME_STEP) != -1:
 		ekf_slam.correct(r_phi_dict)
 	
 	robot_pose, landmarks = ekf_slam.get_state()
-	print(f"robot pose encoders {pose}, ekf: {robot_pose}")
-	# try:
-	# 	print(f"landmarks: {len(landmarks)}\n{landmarks}")
-	# 	error = (pose - robot_pose)/robot_pose *100
-	# 	print(error)
+	print(f"robot pose encoders {pose}")
+	try:
+		print(f"landmarks: {len(landmarks)}\n{landmarks}")
+		error = (pose - robot_pose)/robot_pose *100
+		print(error)
 		
-	# 	print("-"*20)
-	# 	# ekf_slam.plot_landmarks(landmarks, robot_pose)
-	# except:
-		# print("No landmarks detected")
+		print("-"*20)
+		ekf_slam.plot_landmarks(landmarks, robot_pose)
+	except:
+		print("No landmarks detected")
 
 	# image_array = np.frombuffer(image, np.uint8)
 	# rgb_image = image_array.reshape((camera_rgb.getHeight(), camera_rgb.getWidth(), 4))
@@ -123,7 +124,6 @@ while robot.step(TIME_STEP) != -1:
 			avoidance[i] += delta * delta * COEFFICIENTS[i][j-1]
 		raw_speed = BASE_SPEED + avoidance[i]
 		speeds[i] = min(raw_speed, MAX_VELOCITY)
-
 	# Apply speeds
 	front_left_motor.setVelocity(speeds[0])
 	rear_left_motor.setVelocity(speeds[0])
