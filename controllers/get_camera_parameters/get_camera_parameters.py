@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib as plt
 import cv2
 
-np.set_printoptions(suppress=True, precision=5)
+# np.set_printoptions(suppress=True, precision=5)
 
 # Constants
 TIME_STEP = 32

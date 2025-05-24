@@ -3,16 +3,17 @@ import cv2 as cv
 import glob
 import os
 
-np.set_printoptions(suppress=True, precision=4)
+# np.set_printoptions(suppress=True, precision=4)
 
 # Termination criteria for sub-pixel corner refinement
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-
+width = 10  # Number of inner corners in x-direction
+height = 7  # Number of inner corners in y-direction
 # Chessboard dimensions (number of inner corners)
-chessboard_size = (10, 7)  # 10 corners across columns, 7 down rows
+chessboard_size = (width, height)  # width corners across columns, height down rows
 
 # Square size in real-world units (e.g., millimeters)
-square_size = 25  # example value for A4 printed board — adjust as needed
+square_size = 23  # example value for A4 printed board — adjust as needed
 
 # Prepare object points, like (0,0,0), (1,0,0), ..., scaled by square_size
 objp = np.zeros((chessboard_size[0]*chessboard_size[1], 3), np.float32)
@@ -28,7 +29,7 @@ os.chdir('./controllers/get_camera_parameters/')
 images = glob.glob('*.png')
 
 for fname in images:
-	if fname == '80_80chess.png' or fname == 'Checkerboard-A4-25mm-10x7.png':
+	if fname == '80_80chess.png' or fname == 'Checkerboard-A4-25mm-widthxheight.png':
 		continue
 	img = cv.imread(fname)
 	gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -43,8 +44,8 @@ for fname in images:
 
 		# Draw and show corners
 		cv.drawChessboardCorners(img, chessboard_size, corners2, ret)
-		cv.imshow('img', img)
-		cv.waitKey(200)
+		# cv.imshow('img', img)
+		# cv.waitKey(200)
 
 cv.destroyAllWindows()
 

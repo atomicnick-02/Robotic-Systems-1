@@ -54,8 +54,13 @@ class AprilTagDetector:
 
 		# Define camera calibration parameters
 		self.focal_length = 205  # Calculated based on FOV and image size
-		fx, fy = 2180.821770876292, 2022.5541555343623
-		cx, cy = 971.9235543445766, 537.3153526641415
+		fx, fy = 836.1823887320612, 836.8960648120933
+		cx, cy = 476.4829871602148, 358.6534290958231
+		
+		fx = fy = 674
+		cx =  400
+		cy = 478.5
+		# print(f"Camera parameters: fx={fx}, fy={fy}, cx={cx}, cy={cy}")
 		camera_matrix = np.array([[fx, 0, cx],
 								  [0, fy, cy],
 								  [0, 0, 1]], dtype=np.float32)
@@ -81,5 +86,5 @@ class AprilTagDetector:
         	    tvec_list,
     	        key=lambda t: np.linalg.norm(t)
         	)
-		# print(tag_locations)
+		print(tag_locations)
 		return tag_locations
