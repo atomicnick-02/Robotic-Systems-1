@@ -57,9 +57,9 @@ class AprilTagDetector:
 		fx, fy = 836.1823887320612, 836.8960648120933
 		cx, cy = 476.4829871602148, 358.6534290958231
 		
-		fx = fy = 674
-		cx =  400
-		cy = 478.5
+		fx = fy = 49_000
+		cx = 1_200 * 3.9
+		cy = 1_200
 		# print(f"Camera parameters: fx={fx}, fy={fy}, cx={cx}, cy={cy}")
 		camera_matrix = np.array([[fx, 0, cx],
 								  [0, fy, cy],
@@ -75,7 +75,9 @@ class AprilTagDetector:
 			tag_id = tag.tag_id
 			# rotate the translation vector
 			tvec = tag.pose_t
-			tvec = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]]) @ tvec
+			rescale = 0.01
+			tvec = np.array(tvec) * rescale
+			tvec = np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]]) @ tvec
 			if tag_id not in tag_locations:
 				tag_locations[tag_id] = [tvec]
 			else:

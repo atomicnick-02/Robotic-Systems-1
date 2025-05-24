@@ -13,6 +13,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/orbbec/protos/Astra.proto"
 
 WorldInfo {
+  basicTimeStep 1
 }
 Viewpoint {
   orientation 0.056607876486998 -0.8041677978714805 -0.5917006854704213 6.046313568486581
@@ -669,13 +670,12 @@ Robot {
           translation 0.027 0.011 0.034
           translationStep 0.001
           fieldOfView 1.047
-          width 958
+          width 720
           height 720
           far 2.5
-          lens Lens {
-          }
           focus Focus {
-            focalLength 183
+            focalDistance 2
+            focalLength 50
           }
         }
         Astra {
