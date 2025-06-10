@@ -109,30 +109,35 @@ class Odometry:
 	
 	def transform_aruco_to_world(self, aruco_dict):
 		"""
-		Transform Aruco marker positions from robot frame to world coordinates.
-		
+		Transform Aruco marker positions from robot frame to world polar coordinates.
+
 		Args:
-			aruco_dict: Dictionary with Aruco IDs as keys and marker positions as values
-			
+			aruco_dict: Dictionary with Aruco IDs as keys and marker positions (list of np.array) as values
+
 		Returns:
-			Dictionary of Aruco IDs with corresponding (r, phi) polar coordinates
+			List of [r, phi] tuples for detected markers
 		"""
 		theta = self.position[2]
-		
+		x_r, y_r = self.position[0], self.position[1]
+
 		result_arr = []
-		
+
 		for aruco_id, positions in aruco_dict.items():
-			
-			
 			for marker_pos in positions:
-				# Transform marker position to world coordinates
-				# world_pos = marker_pos[:2, :] + robot_position #ignore height
-				
-				world_pos = marker_pos[:2, :] #relative to robot position 
-				# Calculate polar coordinates
-				r = float(np.linalg.norm(world_pos.T))
-				phi = angle_normalize(np.arctan2(world_pos[1, 0], world_pos[0, 0]) - theta)
-				
-				result_arr.append([r, float(phi)])
-		
+				# Marker position in robot frame
+				x_m = float(marker_pos[0, 0])
+				y_m = float(marker_pos[1, 0])
+
+				# Convert to world coordinates
+				x_w = x_r + x_m * np.cos(theta) - y_m * np.sin(theta)
+				y_w = y_r + x_m * np.sin(theta) + y_m * np.cos(theta)
+
+				# Convert back to polar relative to robot pose
+				dx = x_w - x_r
+				dy = y_w - y_r
+				r = np.hypot(dx, dy)
+				phi = angle_normalize(np.arctan2(dy, dx) - theta)
+
+				result_arr.append([r, phi])
+
 		return result_arr
