@@ -113,7 +113,10 @@ while robot.step(TIME_STEP) != -1:
 	# timestep = str(robot.getTime())
 	# print(timestep[2:])
 	# cv2.imwrite(f'img{timestep[2:]}.png', gray)
-
+	# print the plot every 10 steps
+	time = robot.getTime()
+	if int(time) % 30 == 0:
+		ekf_slam.plot_landmarks()
 
 	# Compute avoidance-based motor speeds
 	avoidance = [0.0, 0.0]
