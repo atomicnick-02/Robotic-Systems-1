@@ -1,9 +1,10 @@
-# Robotics-Systems-1
+
 # EKF-SLAM using Mahalanobis Distances
 <!-- Dependencies -->
+## Python Simulation Script
+This script implements an Extended Kalman Filter (EKF) for Simultaneous Localization and Mapping (SLAM) using Mahalanobis distances. It simulates a robot moving in a 2D environment, updating its position and landmarks based on sensor measurements.
 
 ### Install dependencies
-
 ```bash
 pip install numpy matplotlib scipy
 ```
@@ -14,12 +15,10 @@ pip install numpy matplotlib scipy
 python python_sim.py
 ```
 
-<!-- Task Done by each Person -->
-### Task Done by George
-- Implemented the EKF-SLAM algorithm using Mahalanobis distances.
-- Implemented the best Hypothesis selection based on Mahalanobis distances.
+## Webots Simulation
+In order to run the Webots simulation, you need to have Webots installed. This can be done by following the instructions on the [Webots website](https://cyberbotics.com/doc/guide/installation-procedure).
 
-### Task Done by Nick
-- Created the simulation environment.
-- Created the Odometry Model. 
-- Wasted time on Husarion Rosbot3.
+After insalling Webots, you need to download the python dependencies 
+```bash
+pip install numpy matplotlib scipy opencv-python pupil_apriltags
+```

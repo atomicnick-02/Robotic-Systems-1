@@ -15,8 +15,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.4334137944421436 -0.20884419871421722 0.8766621831986823 3.9409782090046237
-  position 1.4180019485767217 2.4582802022242576 4.101247539215601
+  orientation 0.3088766663062097 0.1266728284906281 -0.9426288768830214 2.403815625632895
+  position 3.034479900572178 3.3350203240015674 5.478973172318554
   followType "Mounted Shot"
 }
 TexturedBackground {
@@ -31,6 +31,7 @@ RectangleArena {
   wallHeight 1
 }
 Robot {
+  rotation -1 0 0 0
   children [
     DEF MAIN_BODY Pose {
       translation 0 0 0.023
@@ -427,7 +428,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 52.01654268547556
+        position 52.20802511482693
         axis 0 1 0
         anchor 0.05 0.11 0.043
         dampingConstant 5
@@ -444,7 +445,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 0.11 0.043
-        rotation 0 0.9999999999999999 0 1.7510602280388647
+        rotation 0 1 0 1.9425426573902393
         children [
           Pose {
             children [
@@ -492,7 +493,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 58.233601323781926
+        position 58.42508374940193
         axis 0 1 0
         anchor 0.05 -0.11 0.043
         dampingConstant 5
@@ -509,7 +510,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.05 -0.11 0.043
-        rotation 0 -1 0 4.598251748013939
+        rotation 0 -1 0 4.406769322393937
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -531,7 +532,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 52.01654398199224
+        position 52.208026411035966
         axis 0 1 0
         anchor -0.055 0.11 0.043
         dampingConstant 5
@@ -548,7 +549,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 0.11 0.043
-        rotation 0 1 0 1.751061524555551
+        rotation 0 1 0 1.9425439535992746
         children [
           Pose {
             children [
@@ -563,7 +564,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 58.23360302104674
+        position 58.42508544587353
         axis 0 1 0
         anchor -0.055 -0.11 0.043
         dampingConstant 5
@@ -580,7 +581,7 @@ Robot {
       ]
       endPoint Solid {
         translation -0.055 -0.11 0.043
-        rotation 0 -1 0 4.598250050749125
+        rotation 0 -1 0 4.406767625922337
         children [
           Pose {
             rotation 0 0 1 3.141592
@@ -734,7 +735,7 @@ Robot {
 Group {
   children [
     Solid {
-      translation -2.21 2.29 0.25
+      translation -2.27 2.29 0.25
       children [
         Shape {
           appearance PBRAppearance {
@@ -749,21 +750,37 @@ Group {
       name "corner pillar 1"
     }
     Solid {
-      translation 0.7 0.8 0.25
+      translation -0.36 2.33 0.25
       children [
         Shape {
           appearance PBRAppearance {
             baseColor 0 0.45 0.5
           }
-          geometry Box {
-            size 0.3 0.3 0.9
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
           }
         }
       ]
       name "corner pillar 1(1)"
     }
     Solid {
-      translation -2.25 -2.41 0.25
+      translation -0.98 0.27 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 1(2)"
+    }
+    Solid {
+      translation -2.35 -2.31 0.25
       children [
         Shape {
           appearance PBRAppearance {
@@ -778,7 +795,7 @@ Group {
       name "corner pillar 2"
     }
     Solid {
-      translation 2.47 -2.32 0.37
+      translation 2.47 -2.32 0.23
       children [
         Shape {
           appearance PBRAppearance {
@@ -793,20 +810,6 @@ Group {
       name "corner pillar 3"
     }
     Solid {
-      translation -0.7 -0.8 0.25
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0 0.45 0.5
-          }
-          geometry Box {
-            size 0.3 0.3 0.9
-          }
-        }
-      ]
-      name "corner pillar 3(1)"
-    }
-    Solid {
       translation 2.22 2.29 0.25
       children [
         Shape {
@@ -815,7 +818,7 @@ Group {
           }
           geometry Cylinder {
             height 0.5
-            radius 0.25
+            radius 0.3
           }
         }
       ]
@@ -1710,144 +1713,8 @@ Group {
       rotationStep 0
     }
     DEF pic1 Transform {
-      translation 0.850024 0.8 0.3
+      translation 0.589214 1.41696 0.3
       rotation 0 0 1 0.000824399
-      scale 0.001 0.128 0.128
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColorMap ImageTexture {
-              url [
-                "../apriltags36h11_100by100/tag36h11_100_1.png"
-              ]
-              filtering 0
-            }
-            roughness 1
-          }
-          geometry IndexedFaceSet {
-            coord Coordinate {
-              point [
-                0.5 -0.5 0.5
-                0.5 -0.5 -0.5
-                0.5 0.5 -0.5
-                0.5 0.5 0.5
-              ]
-            }
-            texCoord TextureCoordinate {
-              point [
-                0 1
-                0 0
-                1 0
-                1 1
-              ]
-            }
-            coordIndex [
-              0, 1, 2, 3, -1
-            ]
-            texCoordIndex [
-              0, 1, 2, 3, -1
-            ]
-          }
-        }
-        Shape {
-          appearance PBRAppearance {
-            roughness 0.6
-            metalness 0
-          }
-          geometry IndexedFaceSet {
-            coord Coordinate {
-              point [
-                0.5 -0.5 0.5
-                0.5 -0.5 -0.5
-                0.5 0.5 -0.5
-                0.5 0.5 0.5
-                0 -0.5 0.5
-                0 -0.5 -0.5
-                0 0.5 -0.5
-                0 0.5 0.5
-              ]
-            }
-            coordIndex [
-              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
-              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
-            ]
-          }
-        }
-      ]
-      translationStep 0
-      rotationStep 0
-    }
-    DEF pic1 Transform {
-      translation -0.683 -0.64147 0.271668
-      rotation 0.002825731379605195 0.00265306129530258 0.9999924882257535 1.5078
-      scale 0.001 0.128 0.128
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColorMap ImageTexture {
-              url [
-                "../apriltags36h11_100by100/tag36h11_100_1.png"
-              ]
-              filtering 0
-            }
-            roughness 1
-          }
-          geometry IndexedFaceSet {
-            coord Coordinate {
-              point [
-                0.5 -0.5 0.5
-                0.5 -0.5 -0.5
-                0.5 0.5 -0.5
-                0.5 0.5 0.5
-              ]
-            }
-            texCoord TextureCoordinate {
-              point [
-                0 1
-                0 0
-                1 0
-                1 1
-              ]
-            }
-            coordIndex [
-              0, 1, 2, 3, -1
-            ]
-            texCoordIndex [
-              0, 1, 2, 3, -1
-            ]
-          }
-        }
-        Shape {
-          appearance PBRAppearance {
-            roughness 0.6
-            metalness 0
-          }
-          geometry IndexedFaceSet {
-            coord Coordinate {
-              point [
-                0.5 -0.5 0.5
-                0.5 -0.5 -0.5
-                0.5 0.5 -0.5
-                0.5 0.5 0.5
-                0 -0.5 0.5
-                0 -0.5 -0.5
-                0 0.5 -0.5
-                0 0.5 0.5
-              ]
-            }
-            coordIndex [
-              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
-              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
-            ]
-          }
-        }
-      ]
-      translationStep 0
-      rotationStep 0
-    }
-    DEF pic1 Transform {
-      translation -0.849608 -0.803964 0.3
-      rotation 0 0 0.9999999999999999 3.14
       scale 0.001 0.128 0.128
       children [
         Shape {

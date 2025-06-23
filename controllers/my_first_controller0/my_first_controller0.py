@@ -101,7 +101,7 @@ while robot.step(TIME_STEP) != -1:
 	left_enc  = rl_ps.getValue()
 	right_enc = rr_ps.getValue()
 	enc_vals = [left_enc, right_enc]
-	print(f"Encoders: {enc_vals[0]:.2f}, {enc_vals[1]:.2f}", end="  ")
+	# print(f"Encoders: {enc_vals[0]:.2f}, {enc_vals[1]:.2f}", end="  ")
 
 	# Detect AprilTags
 	res = april_detector.detect(image)
@@ -144,16 +144,16 @@ while robot.step(TIME_STEP) != -1:
 	print(f"\nOdometry pose: {pose}")
 	print(f"EKF pose:      {robot_pose}")
 
-	try:
-		print(f"Landmarks in FOV: {len(r_phi_dict)}")
-		print(f"Total landmarks: {len(landmarks)}\n{landmarks}")
-	except:
-		print("No landmarks detected")
+	# try:
+	# 	print(f"Landmarks in FOV: {len(r_phi_dict)}")
+	# 	print(f"Total landmarks: {len(landmarks)}\n{landmarks}")
+	# except:
+	# 	print("No landmarks detected")
 
 	print("-" * 30)
 	time =  robot.getTime()
 	# every n seconds, plot the landmarks
-	if int(time) % 10 == 0:
+	if int(time) % 5 == 0:
 		ekf_slam.plot_landmarks()
  	
   	# Compute avoidance-based motor speeds
