@@ -1,15 +1,13 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 class EKF_SLAM:
     def __init__(self):
         self.hypotheses = [self.Hypothesis(np.zeros(3), np.eye(3))]
-        self.R = np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2
-        self.Q = np.diag([1.0, np.deg2rad(5)]) ** 2
+        self.R = np.diag([0.005, 0.005, np.deg2rad(0.2)]) ** 2
+        self.Q = np.diag([0.1, np.deg2rad(5)]) ** 2
         self.dt = 0.032
         self.alpha_threshold = 9.21
-        self.min_landmark_distance = 0.5
+        self.min_landmark_distance = 0.6
         self.max_hypotheses = 5
 
     class Hypothesis:
@@ -52,7 +50,7 @@ class EKF_SLAM:
             mu_bar, Sigma_bar = self._motion_update(hyp.mu, hyp.Sigma, u)
             new_hypotheses.append(self.Hypothesis(mu_bar, Sigma_bar, hyp.score))
         self.hypotheses = new_hypotheses
-    
+
     def update(self, u, z):
         self.predict(u)
         if z:
@@ -77,7 +75,6 @@ class EKF_SLAM:
         self.hypotheses = sorted(new_hypotheses, key=lambda h: h.score, reverse=True)[:self.max_hypotheses]
         best = self.hypotheses[0]
         best.mu, best.Sigma = self._merge_close_landmarks(best.mu, best.Sigma, self.min_landmark_distance)
-
 
     def _motion_update(self, mu, Sigma, u):
         v, w = u
@@ -147,6 +144,7 @@ class EKF_SLAM:
 
         return associations
 
+
     def _add_new_landmark(self, mu, Sigma, z):
         r, phi = z
         lx = mu[0] + r * np.cos(phi + mu[2])
@@ -154,8 +152,9 @@ class EKF_SLAM:
         mu_new = np.append(mu, [lx, ly])
         Sigma_new = np.zeros((len(mu_new), len(mu_new)))
         Sigma_new[:len(Sigma), :len(Sigma)] = Sigma
-        Sigma_new[-2:, -2:] = np.diag([4.0, 4.0])
+        Sigma_new[-2:, -2:] = np.diag([0.05, 0.05])
         return mu_new, Sigma_new
+
 
     def _merge_close_landmarks(self, mu, Sigma, distance_threshold):
         if len(mu) <= 3:
@@ -167,115 +166,50 @@ class EKF_SLAM:
         new_lms = []
         keep_indices = []
 
+        print(f"[Merge] Checking {N} landmarks with threshold {distance_threshold:.2f} m")
+
         for i in range(N):
             if used[i]:
                 continue
+
             cluster = [lms[i]]
+            cluster_indices = [i]
             used[i] = True
+
             for j in range(i + 1, N):
-                if not used[j] and np.linalg.norm(lms[i] - lms[j]) < distance_threshold:
+                if used[j]:
+                    continue
+
+                diff = lms[i] - lms[j]
+                euclidean_dist = np.linalg.norm(diff)
+
+                if euclidean_dist < distance_threshold:
                     cluster.append(lms[j])
+                    cluster_indices.append(j)
                     used[j] = True
 
             merged = np.mean(cluster, axis=0)
             new_lms.append(merged)
             keep_indices.append(i)
 
+            if len(cluster) > 1:
+                print(f"[Merge] Clustered landmarks {cluster_indices} at {np.round(cluster, 2)}")
+                print(f"        → Merged at {np.round(merged, 2)}")
+
+        # Rebuild state vector and covariance
         new_mu = mu[:3]
         for lm in new_lms:
             new_mu = np.append(new_mu, lm)
 
         new_Sigma = np.zeros((len(new_mu), len(new_mu)))
         new_Sigma[:3, :3] = Sigma[:3, :3]
+
         for i, old_idx in enumerate(keep_indices):
             old_lm_idx = 3 + 2 * old_idx
             new_lm_idx = 3 + 2 * i
             new_Sigma[new_lm_idx:new_lm_idx + 2, new_lm_idx:new_lm_idx + 2] = \
                 Sigma[old_lm_idx:old_lm_idx + 2, old_lm_idx:old_lm_idx + 2]
 
+        print(f"[Merge] {len(new_lms)} landmarks after merging\n{'-'*40}")
         return new_mu, new_Sigma
-
-    def plot_landmarks(self):
-        pose, landmarks = self.get_state()
-        plt.cla()
-        if landmarks is not None:
-            plt.scatter(landmarks[:, 0], landmarks[:, 1], c='r', label='Landmarks')
-        plt.quiver(pose[0], pose[1],
-                   np.cos(pose[2]), np.sin(pose[2]),
-                   angles='xy', scale_units='xy', scale=0.5,
-                   color='b', label='Robot')
-        plt.xlim(-10, 20)
-        plt.ylim(-10, 20)
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('EKF SLAM Map')
-        plt.grid()
-        plt.legend()
-        plt.pause(0.001)
-
-def wrap_angle(angle):
-    return (angle + np.pi) % (2 * np.pi) - np.pi
-
-def run_ekf_slam_mht():
-    ekf_slam = EKF_SLAM()
-    ekf_slam.set_time_step(1.0)
-    ekf_slam.set_noise_parameters(
-        R=np.diag([0.1, 0.1, np.deg2rad(5)]) ** 2,
-        Q=np.diag([0.5, np.deg2rad(2.0)]) ** 2
-    )
-    ekf_slam.set_landmark_threshold(alpha_threshold=9.21, min_distance=1.0)
-
-    landmarks = np.array([[5, 10], [10, 0], [15, 15], [-5, -5]])
-
-    path = []
-    estimated_landmarks_over_time = []
-
-    for t in range(50):
-        if t < 10:
-            u = [1.0, np.deg2rad(10)]
-        elif 10 <= t < 28:
-            u = [0.0, np.deg2rad(10)]
-        else:
-            u = [1.0, np.deg2rad(10)]
-
-        pose, _ = ekf_slam.get_state()
-        z = []
-        FOV = np.deg2rad(30)  
-        for (lx, ly) in landmarks:
-            dx = lx - pose[0]
-            dy = ly - pose[1]
-            r = np.sqrt(dx**2 + dy**2)
-            bearing = wrap_angle(np.arctan2(dy, dx) - pose[2])
-
-            if -FOV / 2 <= bearing <= FOV / 2:
-                noisy_r = r + np.random.normal(0, np.sqrt(ekf_slam.Q[0, 0]))
-                noisy_phi = wrap_angle(bearing + np.random.normal(0, np.sqrt(ekf_slam.Q[1, 1])))
-                z.append(np.array([noisy_r, noisy_phi]))
-
-        ekf_slam.update(u, z)
-        pose, lms = ekf_slam.get_state()
-        path.append(pose[:2])
-        if lms is not None:
-            estimated_landmarks_over_time.append(lms.copy())
-        ekf_slam.plot_landmarks()
-
-    path = np.array(path)
-    plt.figure(figsize=(10, 8))
-    plt.plot(path[:, 0], path[:, 1], 'b-', label='Estimated Path')
-    plt.scatter(landmarks[:, 0], landmarks[:, 1], c='g', marker='^', label='True Landmarks')
-
-    if estimated_landmarks_over_time:
-        final_lms = estimated_landmarks_over_time[-1]
-        plt.scatter(final_lms[:, 0], final_lms[:, 1], c='r', marker='x', label='Estimated Landmarks')
-
-    plt.title("EKF-SLAM with MHT")
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.grid(True)
-    plt.axis("equal")
-    plt.legend()
-    plt.show()
-
-run_ekf_slam_mht()
-
 

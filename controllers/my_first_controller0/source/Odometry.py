@@ -2,24 +2,22 @@ from controller import Robot
 import numpy as np
 
 def angle_normalize(angle):
-	"""Normalize angle to be within -π to π."""
-
-	return (angle + np.pi) % (2 * np.pi) - np.pi
+    return np.arctan2(np.sin(angle), np.cos(angle))
 
 
 
 class Odometry:
-	def __init__(self, robot):
+	def __init__(self, robot, time_step_ms):
 		"""
 		Initialize Odometry with Webots Robot instance.
 		Pose is [x, y, theta], and velocity [v, w].
 		"""
 		# Robot parameters
 		self.wheel_radius   = 0.043     # m
-		self.wheel_distance = 0.195     # m between wheels
+		self.wheel_distance = 0.28     # m between wheels
 		
 		# Time step (s)
-		self.dt = robot.getBasicTimeStep() / 1000.0
+		self.dt = time_step_ms / 1000.0
 		
 		# State
 		self.prev_enc = None            # will hold [left, right] on first update
@@ -37,7 +35,7 @@ class Odometry:
 			velocity: np.array([v (m/s), ω (rad/s)])
 		"""
 		enc = np.array([left_encoder, right_encoder])
-
+		print(f"dt = {self.dt:.4f} s")
 		# First call: just initialize previous encoders
 		if self.prev_enc is None:
 			self.prev_enc = enc.copy()
@@ -60,7 +58,7 @@ class Odometry:
 
 		# 5) Mid‐point integration for x, y
 		theta_old = self.position[2]
-		theta_mid = theta_old + d_theta / 2.0
+		theta_mid = angle_normalize(theta_old + d_theta / 2.0)
 
 		self.position[0] += d_center * np.cos(theta_mid)
 		self.position[1] += d_center * np.sin(theta_mid)
@@ -74,7 +72,7 @@ class Odometry:
 
 		# 7) Save for next iteration
 		self.prev_enc = enc.copy()
-
+		print(f"ΔL: {dL:.4f}, ΔR: {dR:.4f}, θ: {np.degrees(self.position[2]):.2f}°")
 		return self.position.copy(), self.velocity.copy()
 
 	def get_velocity(self):
