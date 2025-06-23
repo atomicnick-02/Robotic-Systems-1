@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class EKF_SLAM:
     def __init__(self):
@@ -212,4 +213,22 @@ class EKF_SLAM:
 
         print(f"[Merge] {len(new_lms)} landmarks after merging\n{'-'*40}")
         return new_mu, new_Sigma
+    
+    def plot_landmarks(self):
+        pose, landmarks = self.get_state()
+        plt.cla()
+        if landmarks is not None:
+            plt.scatter(landmarks[:, 0], landmarks[:, 1], c='r', label='Landmarks')
+        plt.quiver(pose[0], pose[1],
+                   np.cos(pose[2]), np.sin(pose[2]),
+                   angles='xy', scale_units='xy', scale=0.5,
+                   color='b', label='Robot')
+        plt.xlim(-5, 5)
+        plt.ylim(-5, 5)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('EKF SLAM Map')
+        plt.grid()
+        plt.legend()
+        plt.pause(0.001)
 
