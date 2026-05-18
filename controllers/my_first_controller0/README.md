@@ -1,29 +1,51 @@
 
-# EKF-SLAM using Mahalanobis Distances
-<!-- Dependencies -->
-## Python Simulation Script
-This script implements an Extended Kalman Filter (EKF) for Simultaneous Localization and Mapping (SLAM) using Mahalanobis distances. It simulates a robot moving in a 2D environment, updating its position and landmarks based on sensor measurements.
+# EKF-SLAM with Mahalanobis Distances
 
-### Install dependencies
-```bash
-pip install numpy matplotlib scipy
-```
----
-### Run the script
+A robust SLAM (Simultaneous Localization and Mapping) implementation using an Extended Kalman Filter (EKF) and Multiple Hypothesis Tracking (MHT). This project provides both a standalone Python simulation and a Webots-based environment for testing robot navigation and mapping.
 
-```bash
-python python_sim.py
-```
+## Features
 
-## Webots Simulation
-In order to run the Webots simulation, you need to have Webots installed. This can be done by following the instructions on the [Webots website](https://cyberbotics.com/doc/guide/installation-procedure).
+- **EKF-SLAM-MHT**: Efficiently handles data association uncertainty by maintaining multiple hypotheses.
+- **Mahalanobis Distance**: Uses statistical distance for robust outlier rejection and landmark association.
+- **Dual Support**: Includes a lightweight 2D Python simulation and a high-fidelity Webots simulation.
+- **AprilTag Detection**: Integration with AprilTag markers for reliable visual landmarks in Webots.
 
-After insalling Webots, you need to download the python dependencies needed for the simulation. You can do this by running the following command in your terminal:
+## Installation
 
+### Prerequisites
+
+Ensure you have Python 3.x installed. For the Webots simulation, [download and install Webots](https://cyberbotics.com/doc/guide/installation-procedure).
+
+### Dependencies
+
+Install the required Python packages:
 
 ```bash
 pip install numpy matplotlib scipy opencv-python pupil_apriltags
 ```
 
+## Getting Started
 
-After installing the dependencies, open the webots app and at the top left corner, click on `File` -> `Open World...` and select the `worlds/EKF_Slam.wbt` file from the directory.
+### 1. Python Simulation
+The standalone script simulates a robot moving in a 2D environment, visualizing its estimated trajectory and landmark positions in real-time.
+
+```bash
+python python_sim.py
+```
+
+### 2. Webots Simulation
+To run the high-fidelity simulation in Webots:
+
+1. Launch the **Webots** application.
+2. Go to `File` -> `Open World...`.
+3. Select `worlds/EKF_Slam.wbt` from the project directory.
+4. Press the **Play** button to start the simulation.
+
+## Project Structure
+
+- `python_sim.py`: Main entry point for the 2D Python simulation.
+- `source/`: Core SLAM algorithms and helper modules.
+    - `EKFSlam.py`: EKF-SLAM implementation.
+    - `Odometry.py`: Motion model and encoder integration.
+    - `ApriltagDetector.py`: Visual landmark processing.
+- `worlds/`: Webots world files.
