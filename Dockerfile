@@ -1,8 +1,13 @@
-
+# ============================================================
+# Webots EKF-SLAM Docker Image
+# Base: Ubuntu 22.04 (jammy) — best Webots compatibility
+# Supports: X11 forwarding (GUI) + headless (Xvfb) modes
+# ============================================================
 FROM ubuntu:22.04
 
 # ---------- Build args ----------
 ARG WEBOTS_VERSION=R2023b
+ARG WEBOTS_DEB_VERSION=2023b
 ARG DEBIAN_FRONTEND=noninteractive
 
 # ---------- Labels ----------
@@ -64,7 +69,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ---------- Install Webots ----------
 # Downloads the official .deb from GitHub releases
-RUN wget -q "https://github.com/cyberbotics/webots/releases/download/${WEBOTS_VERSION}/webots_${WEBOTS_VERSION}_amd64.deb" \
+RUN wget -q "https://github.com/cyberbotics/webots/releases/download/${WEBOTS_VERSION}/webots_${WEBOTS_DEB_VERSION}_amd64.deb" \
         -O /tmp/webots.deb \
     && apt-get update \
     && apt-get install -y --no-install-recommends /tmp/webots.deb \
@@ -96,17 +101,51 @@ WORKDIR /home/simuser/ekf_slam
 # ---------- Environment ----------
 ENV WEBOTS_HOME=/usr/local/webots
 ENV PATH="${WEBOTS_HOME}/bin:${PATH}"
-# Tell Webots where Python is
-ENV PYTHONPATH="${WEBOTS_HOME}/lib/controller/python:${PYTHONPATH}"
+
+# Webots built-in Python controller bindings
+ENV PYTHONPATH="${WEBOTS_HOME}/lib/controller/python"
+
+# ── Repo-specific paths ──────────────────────────────────────
+# controller root → so `from source.EKFSlam import ...` resolves correctly
+# (source/ lives at controllers/my_first_controller0/source/)
+ENV PYTHONPATH="${PYTHONPATH}:/home/simuser/ekf_slam/Robotic_Systems/controllers/my_first_controller0"
+
+# Webots resolves PROTO files relative to the project directory
+ENV WEBOTS_PROJECT_DIR=/home/simuser/ekf_slam/Robotic_Systems
+
 # Suppress Qt platform warnings in X11 mode
 ENV QT_X11_NO_MITSHM=1
 # Default display (overridable at runtime)
 ENV DISPLAY=:0
 
-# ---------- Entrypoint ----------
-COPY --chown=simuser:simuser docker/entrypoint.sh /home/simuser/entrypoint.sh
+# ---------- Entrypoint (inlined — avoids .dockerignore issues) ----------
+RUN cat > /home/simuser/entrypoint.sh << 'EOF'
+#!/usr/bin/env bash
+set -e
+
+DISPLAY_MODE="${DISPLAY_MODE:-GUI}"
+
+if [[ "${DISPLAY_MODE}" == "HEADLESS" ]]; then
+    echo "[entrypoint] Starting Xvfb virtual display on :99"
+    Xvfb :99 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset &
+    XVFB_PID=$!
+    export DISPLAY=:99
+    sleep 1
+    trap "kill ${XVFB_PID} 2>/dev/null || true" EXIT
+else
+    echo "[entrypoint] Using host X display: ${DISPLAY}"
+    if [[ -z "${DISPLAY}" ]]; then
+        echo "[entrypoint] WARNING: DISPLAY not set. Run: xhost +local:docker"
+    fi
+fi
+
+echo "[entrypoint] Webots: $(webots --version 2>/dev/null || echo 'unknown')"
+echo "[entrypoint] Python: $(python3 --version)"
+echo "[entrypoint] Executing: $*"
+exec "$@"
+EOF
 RUN chmod +x /home/simuser/entrypoint.sh
 
 ENTRYPOINT ["/home/simuser/entrypoint.sh"]
 # Default: launch Webots with the EKF world
-CMD ["webots", "--mode=realtime", "worlds/EKF_Slam.wbt"]
+CMD ["webots", "--mode=realtime", "/home/simuser/ekf_slam/Robotic_Systems/worlds/EKF_Slam.wbt"]

@@ -1,0 +1,87 @@
+# ============================================================
+# docker-compose.yml — Webots EKF-SLAM
+#
+# Two profiles:
+#   gui      → renders on your Arch Linux desktop via X11
+#   headless → runs in a virtual framebuffer (no window)
+#
+# Usage:
+#   GUI mode:      docker compose --profile gui up
+#   Headless mode: docker compose --profile headless up
+# ============================================================
+
+services:
+
+  # ----------------------------------------------------------
+  # GUI mode — forwards Webots window to your Arch X server
+  # ----------------------------------------------------------
+  webots-gui:
+    profiles: [gui]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ekf-slam-webots:latest
+    container_name: webots_gui
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - DISPLAY_MODE=GUI
+      # Pass host GPU info if available
+      - LIBGL_ALWAYS_INDIRECT=0
+    volumes:
+      # X11 socket — lets the container draw on your desktop
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Mount project source live so edits reflect immediately
+      - ..:/home/simuser/ekf_slam:rw
+      # Persist Webots preferences between runs
+      - webots-prefs:/home/simuser/.config/Cyberbotics
+    devices:
+      # Pass through DRI for GPU-accelerated rendering (optional)
+      # Comment out if you hit permission errors
+      - /dev/dri:/dev/dri
+    network_mode: host
+    stdin_open: true
+    tty: true
+    # Override CMD to open the EKF world directly
+    command: ["webots", "--mode=realtime", "/home/simuser/ekf_slam/Robotic_Systems/worlds/EKF_Slam.wbt"]
+
+  # ----------------------------------------------------------
+  # Headless mode — Xvfb virtual display, no window on host
+  # Useful for CI / automated runs / SSH sessions
+  # ----------------------------------------------------------
+  webots-headless:
+    profiles: [headless]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ekf-slam-webots:latest
+    container_name: webots_headless
+    environment:
+      - DISPLAY_MODE=HEADLESS
+    volumes:
+      - ..:/home/simuser/ekf_slam:rw
+      - webots-prefs:/home/simuser/.config/Cyberbotics
+    stdin_open: true
+    tty: true
+    command: ["webots", "--mode=realtime", "--no-sandbox", "/home/simuser/ekf_slam/Robotic_Systems/worlds/EKF_Slam.wbt"]
+
+  # ----------------------------------------------------------
+  # Python-only simulation (no Webots required)
+  # ----------------------------------------------------------
+  python-sim:
+    profiles: [python]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ekf-slam-webots:latest
+    container_name: python_sim
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - DISPLAY_MODE=GUI
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ..:/home/simuser/ekf_slam:rw
+    network_mode: host
+    command: ["python3", "controllers/my_first_controller0/my_first_controller0.py"]
+
+volumes:
+  webots-prefs:
