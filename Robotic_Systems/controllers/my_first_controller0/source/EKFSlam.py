@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib
+matplotlib.use('Qt5Agg') # Use Qt5Agg for interactive window in Docker
 import matplotlib.pyplot as plt
 
 class EKF_SLAM:

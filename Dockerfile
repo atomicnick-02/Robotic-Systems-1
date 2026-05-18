@@ -6,8 +6,8 @@
 FROM ubuntu:22.04
 
 # ---------- Build args ----------
-ARG WEBOTS_VERSION=R2023b
-ARG WEBOTS_DEB_VERSION=2023b
+ARG WEBOTS_VERSION=R2025a
+ARG WEBOTS_DEB_VERSION=2025a
 ARG DEBIAN_FRONTEND=noninteractive
 
 # ---------- Labels ----------
@@ -65,6 +65,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxdamage1 \
     libxshmfence1 \
     libgbm1 \
+    # Qt for Matplotlib interactive windows
+    python3-pyqt5 \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------- Install Webots ----------
@@ -101,6 +103,9 @@ WORKDIR /home/simuser/ekf_slam
 # ---------- Environment ----------
 ENV WEBOTS_HOME=/usr/local/webots
 ENV PATH="${WEBOTS_HOME}/bin:${PATH}"
+
+# Matplotlib config directory to avoid permission issues
+ENV MPLCONFIGDIR=/tmp/matplotlib-cache
 
 # Webots built-in Python controller bindings
 ENV PYTHONPATH="${WEBOTS_HOME}/lib/controller/python"
