@@ -1,0 +1,39 @@
+# ============================================================
+# .dockerignore — keeps the build context lean
+# ============================================================
+
+# Git history
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Editor / OS junk
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Docker files themselves (avoid recursive copy)
+Dockerfile
+.dockerignore
+docker/
+
+# CI / docs that don't affect the sim
+.github/
+*.md
