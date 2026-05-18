@@ -1,0 +1,1920 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/GlossyPaint.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/MattePaint.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Rubber.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/tdk/protos/Mpu-9250.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/slamtec/protos/RpLidarA2.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/orbbec/protos/Astra.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.3088766663062097 0.1266728284906281 -0.9426288768830214 2.403815625632895
+  position 3.034479900572178 3.3350203240015674 5.478973172318554
+  followType "Mounted Shot"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 5 5
+  floorAppearance Parquetry {
+    type "dark strip"
+  }
+  wallHeight 1
+}
+Robot {
+  rotation -1 0 0 0
+  children [
+    DEF MAIN_BODY Pose {
+      translation 0 0 0.023
+      children [
+        Shape {
+          appearance GlossyPaint {
+          }
+          geometry Mesh {
+            url [
+              "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/body.obj"
+            ]
+          }
+        }
+      ]
+    }
+    DEF PORTS Pose {
+      translation 0 0 0.023
+      children [
+        Shape {
+          appearance MattePaint {
+            baseColor 0 0 0
+          }
+          geometry Mesh {
+            url [
+              "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/black_ports.obj"
+            ]
+          }
+        }
+      ]
+    }
+    DEF METALLIC_CONNECTIONS Pose {
+      translation 0 0 0.023
+      children [
+        Shape {
+          appearance BrushedAluminium {
+            colorOverride 0.7 0.7 0.7
+          }
+          geometry Mesh {
+            url [
+              "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/metallic_connections.obj"
+            ]
+          }
+        }
+      ]
+    }
+    DEF ANTENNA Pose {
+      translation -0.099 0.05 0.1
+      rotation 0 1 0 -0.785395307179586
+      children [
+        Shape {
+          appearance MattePaint {
+            baseColor 0 0 0
+          }
+          geometry Cylinder {
+            height 0.02
+            radius 0.005
+          }
+        }
+        Pose {
+          translation 0.023 0 0.032
+          rotation 0 1 0 0.785398
+          children [
+            Shape {
+              appearance MattePaint {
+                baseColor 0 0 0
+              }
+              geometry Capsule {
+                bottom FALSE
+                height 0.07
+                radius 0.004
+              }
+            }
+          ]
+        }
+      ]
+    }
+    DEF LIDAR_CABLE Pose {
+      translation -0.034 0 0.1004
+      rotation 0 -1 0 -0.261795307179586
+      children [
+        Shape {
+          appearance MattePaint {
+            baseColor 0 0 0
+          }
+          geometry Capsule {
+            height 0.01
+            radius 0.003
+          }
+        }
+      ]
+    }
+    DEF SCREWS Group {
+      children [
+        DEF SCREW1 Pose {
+          translation 0.07 0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            DEF BLACK_SCREW_SHAPE Shape {
+              appearance GlossyPaint {
+                baseColor 0 0 0
+              }
+              geometry Mesh {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/screw.obj"
+                ]
+              }
+            }
+          ]
+        }
+        DEF SCREW2 Pose {
+          translation 0 0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW3 Pose {
+          translation -0.07 0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW4 Pose {
+          translation 0.07 -0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW5 Pose {
+          translation 0 -0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW6 Pose {
+          translation -0.07 -0.068 0.091
+          rotation 1 0 0 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW7 Pose {
+          translation 0.089 -0.068 0.055
+          rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 -2.094395307179586
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW8 Pose {
+          translation 0.089 -0.031 0.055
+          rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 -2.094395307179586
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW9 Pose {
+          translation 0.089 0.068 0.055
+          rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 -2.094395307179586
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW10 Pose {
+          translation 0.089 0.031 0.055
+          rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 -2.094395307179586
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW11 Pose {
+          translation -0.083 0.035 0.0845
+          rotation 0.9238797538372345 5.077418647149253e-07 0.38268289803621075 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW12 Pose {
+          translation -0.083 0.005 0.0845
+          rotation 0.9238797538372345 5.077418647149253e-07 0.38268289803621075 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW13 Pose {
+          translation -0.083 -0.005 0.0845
+          rotation 0.9238797538372345 5.077418647149253e-07 0.38268289803621075 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW14 Pose {
+          translation -0.083 -0.035 0.0845
+          rotation 0.9238797538372345 5.077418647149253e-07 0.38268289803621075 3.14159
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW15 Pose {
+          translation -0.089 0.0685 0.052
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW16 Pose {
+          translation -0.089 0.0315 0.052
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW17 Pose {
+          translation -0.089 -0.0685 0.052
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW18 Pose {
+          translation -0.089 -0.0315 0.052
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW19 Pose {
+          translation -0.089 -0.036 0.077
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW20 Pose {
+          translation -0.089 -0.069 0.077
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW21 Pose {
+          translation -0.089 0.0065 0.0735
+          rotation 0 1 0 1.5708
+          children [
+            USE BLACK_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW22 Pose {
+          translation -0.089 0.0365 0.072
+          rotation 0 1 0 1.5708
+          children [
+            DEF METAL_SCREW_SHAPE Shape {
+              appearance BrushedAluminium {
+              }
+              geometry Mesh {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/screw.obj"
+                ]
+              }
+            }
+          ]
+        }
+        DEF SCREW23 Pose {
+          translation -0.089 0.0635 0.072
+          rotation 0 1 0 1.5708
+          children [
+            USE METAL_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW24 Pose {
+          translation 0.008 0.0665 0.0915
+          rotation 0.5773489358556708 0.5773509358554485 -0.5773509358554485 2.0944
+          children [
+            USE METAL_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW25 Pose {
+          translation -0.008 0.0665 0.0915
+          rotation 0.5773489358556708 0.5773509358554485 -0.5773509358554485 2.0944
+          children [
+            USE METAL_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW26 Pose {
+          translation 0.008 -0.0665 0.0915
+          rotation -1 0 0 1.5708
+          children [
+            USE METAL_SCREW_SHAPE
+          ]
+        }
+        DEF SCREW27 Pose {
+          translation -0.008 -0.0665 0.0915
+          rotation -1 0 0 1.5708
+          children [
+            USE METAL_SCREW_SHAPE
+          ]
+        }
+      ]
+    }
+    DEF INTERIOR Pose {
+      translation 0 0 0.061
+      children [
+        Shape {
+          appearance MattePaint {
+            baseColor 0 0 0
+          }
+          geometry Box {
+            size 0.15 0.14 0.07
+          }
+        }
+      ]
+    }
+    Solid {
+      children [
+        Pose {
+          translation 0 0 0.098
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 0.8 0 0
+              }
+              geometry Mesh {
+                url [
+                  "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/cover.obj"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+      name "cover"
+    }
+    DEF FL_WHEEL_AXIS Pose {
+      translation 0.053 0.092 0.041
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Shape {
+          appearance GlossyPaint {
+            baseColor 0.11 0.11 0.11
+          }
+          geometry Cylinder {
+            height 0.037
+            radius 0.005
+          }
+        }
+      ]
+    }
+    DEF FR_WHEEL_AXIS Pose {
+      translation 0.053 -0.092 0.041
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Shape {
+          appearance GlossyPaint {
+            baseColor 0.11 0.11 0.11
+          }
+          geometry Cylinder {
+            height 0.037
+            radius 0.005
+          }
+        }
+      ]
+    }
+    DEF RL_WHEEL_AXIS Pose {
+      translation -0.054 0.092 0.041
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Shape {
+          appearance GlossyPaint {
+            baseColor 0.11 0.11 0.11
+          }
+          geometry Cylinder {
+            height 0.037
+            radius 0.005
+          }
+        }
+      ]
+    }
+    DEF RR_WHEEL_AXIS Pose {
+      translation -0.054 -0.092 0.041
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Shape {
+          appearance GlossyPaint {
+            baseColor 0.11 0.11 0.11
+          }
+          geometry Cylinder {
+            height 0.037
+            radius 0.005
+          }
+        }
+      ]
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 52.20802511482693
+        axis 0 1 0
+        anchor 0.05 0.11 0.043
+        dampingConstant 5
+      }
+      device [
+        RotationalMotor {
+          name "fl_wheel_joint"
+          maxVelocity 26
+          maxTorque 100
+        }
+        PositionSensor {
+          name "front left wheel motor sensor"
+        }
+      ]
+      endPoint Solid {
+        translation 0.05 0.11 0.043
+        rotation 0 1 0 1.9425426573902393
+        children [
+          Pose {
+            children [
+              DEF RIM_AND_TIRE_SHAPES Group {
+                children [
+                  DEF RIM_SHAPE Shape {
+                    appearance BrushedAluminium {
+                    }
+                    geometry Mesh {
+                      url [
+                        "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/wheel_rim.obj"
+                      ]
+                    }
+                  }
+                  DEF TIRE_SHAPE Shape {
+                    appearance Rubber {
+                    }
+                    geometry Mesh {
+                      url [
+                        "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/wheel_tire.obj"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+        name "front left wheel"
+        boundingObject DEF LEFT_WHEEL_CYLINDER Pose {
+          translation 0 -0.0115 0
+          rotation 1 0 0 -1.5708
+          children [
+            DEF WHEEL_CYLINDER Cylinder {
+              height 0.035
+              radius 0.043
+            }
+          ]
+        }
+        physics DEF WHEEL_PHYSICS Physics {
+          density -1
+          mass 0.5
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 58.42508374940193
+        axis 0 1 0
+        anchor 0.05 -0.11 0.043
+        dampingConstant 5
+      }
+      device [
+        RotationalMotor {
+          name "fr_wheel_joint"
+          maxVelocity 26
+          maxTorque 100
+        }
+        PositionSensor {
+          name "front right wheel motor sensor"
+        }
+      ]
+      endPoint Solid {
+        translation 0.05 -0.11 0.043
+        rotation 0 -1 0 4.406769322393937
+        children [
+          Pose {
+            rotation 0 0 1 3.141592
+            children [
+              USE RIM_AND_TIRE_SHAPES
+            ]
+          }
+        ]
+        name "front right wheel"
+        boundingObject DEF RIGHT_WHEEL_CYLINDER Pose {
+          translation 0 0.0115 0
+          rotation 1 0 0 -1.5708
+          children [
+            USE WHEEL_CYLINDER
+          ]
+        }
+        physics USE WHEEL_PHYSICS
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 52.208026411035966
+        axis 0 1 0
+        anchor -0.055 0.11 0.043
+        dampingConstant 5
+      }
+      device [
+        RotationalMotor {
+          name "rl_wheel_joint"
+          maxVelocity 26
+          maxTorque 100
+        }
+        PositionSensor {
+          name "rear left wheel motor sensor"
+        }
+      ]
+      endPoint Solid {
+        translation -0.055 0.11 0.043
+        rotation 0 1 0 1.9425439535992746
+        children [
+          Pose {
+            children [
+              USE RIM_AND_TIRE_SHAPES
+            ]
+          }
+        ]
+        name "rear left wheel"
+        boundingObject USE LEFT_WHEEL_CYLINDER
+        physics USE WHEEL_PHYSICS
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 58.42508544587353
+        axis 0 1 0
+        anchor -0.055 -0.11 0.043
+        dampingConstant 5
+      }
+      device [
+        RotationalMotor {
+          name "rr_wheel_joint"
+          maxVelocity 26
+          maxTorque 100
+        }
+        PositionSensor {
+          name "rear right wheel motor sensor"
+        }
+      ]
+      endPoint Solid {
+        translation -0.055 -0.11 0.043
+        rotation 0 -1 0 4.406767625922337
+        children [
+          Pose {
+            rotation 0 0 1 3.141592
+            children [
+              USE RIM_AND_TIRE_SHAPES
+            ]
+          }
+        ]
+        name "rear right wheel"
+        boundingObject USE RIGHT_WHEEL_CYLINDER
+        physics USE WHEEL_PHYSICS
+      }
+    }
+    Mpu-9250 {
+      translation 0 0 0.043
+      name "imu"
+      includeInertialUnit TRUE
+    }
+    DEF DISTANCE_SENSORS Pose {
+      translation 0 0 0.023
+      children [
+        Shape {
+          appearance MattePaint {
+            baseColor 0 0 0
+          }
+          geometry Mesh {
+            url [
+              "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/husarion/rosbot/protos/meshes/proximity_sensors.obj"
+            ]
+          }
+        }
+      ]
+    }
+    DistanceSensor {
+      translation 0.1 0.05 0.053
+      rotation 0 0 1 0.13
+      name "fl_range"
+      lookupTable [
+        0 0 0
+        1 1 0
+        2 2 0
+      ]
+      type "infra-red"
+      redColorSensitivity 0
+    }
+    DistanceSensor {
+      translation 0.1 -0.05 0.053
+      rotation 0 0 1 -0.13
+      name "fr_range"
+      lookupTable [
+        0 0 0
+        2 2 0
+      ]
+      type "infra-red"
+      redColorSensitivity 0
+    }
+    DistanceSensor {
+      translation -0.1 0.05 0.053
+      rotation 0 0 1 3.01
+      name "rl_range"
+      lookupTable [
+        0 0 0
+        2 2 0
+      ]
+      type "infra-red"
+      redColorSensitivity 0
+    }
+    DistanceSensor {
+      translation -0.1 -0.05 0.053
+      rotation 0 0 1 3.27
+      name "rr_range"
+      lookupTable [
+        0 0 0
+        2 2 0
+      ]
+      type "infra-red"
+      redColorSensitivity 0
+    }
+    DEF CAMERA_SLOT Pose {
+      translation -0.027 0 0.165
+      children [
+        Camera {
+          translation 0.027 0.011 0.034
+          translationStep 0.001
+          fieldOfView 1.047
+          width 720
+          height 720
+          far 2.5
+          focus Focus {
+            focalDistance 2
+            focalLength 50
+          }
+        }
+        Astra {
+          name "astra_camera"
+        }
+      ]
+    }
+    DEF LIDAR_SLOT Pose {
+      translation 0.02 0 0.1
+      children [
+        RpLidarA2 {
+          name "laser"
+        }
+      ]
+    }
+  ]
+  name "rosbot"
+  boundingObject Group {
+    children [
+      DEF MAIN_BODY_BOX Pose {
+        translation 0 0 0.0612
+        children [
+          Box {
+            size 0.2 0.15 0.077
+          }
+        ]
+      }
+      DEF LEFT_SUPPORT_LEG_BOX Pose {
+        translation -0.048 0.038 0.133
+        children [
+          Box {
+            size 0.04 0.023 0.065
+          }
+        ]
+      }
+      DEF RIGHT_SUPPORT_LEG_BOX Pose {
+        translation -0.048 -0.038 0.133
+        children [
+          Box {
+            size 0.04 0.023 0.065
+          }
+        ]
+      }
+      DEF SUPPORT_PLATE_BOX Pose {
+        translation -0.048 0 0.163
+        children [
+          Box {
+            size 0.04 0.1 0.001
+          }
+        ]
+      }
+    ]
+  }
+  physics Physics {
+    density -1
+    mass 0.45
+  }
+  controller "my_first_controller0"
+}
+Group {
+  children [
+    Solid {
+      translation -2.27 2.29 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 1"
+    }
+    Solid {
+      translation -0.36 2.33 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 1(1)"
+    }
+    Solid {
+      translation -0.98 0.27 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 1(2)"
+    }
+    Solid {
+      translation -2.35 -2.31 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 2"
+    }
+    Solid {
+      translation 2.47 -2.32 0.23
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.25
+          }
+        }
+      ]
+      name "corner pillar 3"
+    }
+    Solid {
+      translation 2.22 2.29 0.25
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0.45 0.5
+          }
+          geometry Cylinder {
+            height 0.5
+            radius 0.3
+          }
+        }
+      ]
+      name "corner pillar 4"
+    }
+  ]
+}
+Group {
+  children [
+    DEF pic1 Transform {
+      translation 2.5 0 0.3
+      rotation 0 0 1 -3.14
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 1.2 2.5 0.3
+      rotation 0 0 1 -1.57
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 0.5 2.5 0.3
+      rotation 0 0 1 -1.57
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -1 2.5 0.3
+      rotation 0 0 1 -1.57
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -2.5 1 0.3
+      rotation 0 0 -1 0
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -2.5 0 0.3
+      rotation 0 0 -1 0
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -2.5 -1 0.3
+      rotation 0 0 -1 0
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 2.5 -0.7 0.3
+      rotation 0 0 1 -3.14
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 2.5 0.700095 0.3
+      rotation 0 0 1 -3.14
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 1.50079 2.15984 -0.000743065
+      rotation 0.7071067811865475 0 0.7071067811865475 3.14
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 0.141915 -2.49396 0.182196
+      rotation 0.5966069501299255 0.5374389550757483 0.5960029501804135 2.15425
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 0.896788 -2.49483 0.182198
+      rotation 0.5755809846636449 0.5815199845054003 0.5749269846810707 2.08718
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 2.01753 -2.49613 0.182198
+      rotation 0.5755809846636449 0.5815199845054003 0.5749269846810707 2.08718
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation 0.589214 1.41696 0.3
+      rotation 0 0 1 0.000824399
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -0.821688 -2.49295 0.18219
+      rotation 0.5755809846636449 0.5815199845054003 0.5749269846810707 2.08718
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+    DEF pic1 Transform {
+      translation -1.57537 -2.49202 0.18219
+      rotation 0.5755809846636449 0.5815199845054003 0.5749269846810707 2.08718
+      scale 0.001 0.128 0.128
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColorMap ImageTexture {
+              url [
+                "../apriltags36h11_100by100/tag36h11_100_1.png"
+              ]
+              filtering 0
+            }
+            roughness 1
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+              ]
+            }
+            texCoord TextureCoordinate {
+              point [
+                0 1
+                0 0
+                1 0
+                1 1
+              ]
+            }
+            coordIndex [
+              0, 1, 2, 3, -1
+            ]
+            texCoordIndex [
+              0, 1, 2, 3, -1
+            ]
+          }
+        }
+        Shape {
+          appearance PBRAppearance {
+            roughness 0.6
+            metalness 0
+          }
+          geometry IndexedFaceSet {
+            coord Coordinate {
+              point [
+                0.5 -0.5 0.5
+                0.5 -0.5 -0.5
+                0.5 0.5 -0.5
+                0.5 0.5 0.5
+                0 -0.5 0.5
+                0 -0.5 -0.5
+                0 0.5 -0.5
+                0 0.5 0.5
+              ]
+            }
+            coordIndex [
+              4, 5, 1, 0, -1, 0, 3, 7, 4, -1
+              7, 3, 2, 6, -1, 2, 1, 5, 6, -1
+            ]
+          }
+        }
+      ]
+      translationStep 0
+      rotationStep 0
+    }
+  ]
+}
