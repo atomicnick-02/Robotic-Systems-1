@@ -20,8 +20,10 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      network: host
     image: ekf-slam-webots:latest
     container_name: webots_gui
+    network_mode: host
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - DISPLAY_MODE=GUI
@@ -38,7 +40,6 @@ services:
       # Pass through DRI for GPU-accelerated rendering (optional)
       # Comment out if you hit permission errors
       - /dev/dri:/dev/dri
-    network_mode: host
     stdin_open: true
     tty: true
     # Override CMD to open the EKF world directly
@@ -53,8 +54,10 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      network: host
     image: ekf-slam-webots:latest
     container_name: webots_headless
+    network_mode: host
     environment:
       - DISPLAY_MODE=HEADLESS
     volumes:
@@ -72,6 +75,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      network: host
     image: ekf-slam-webots:latest
     container_name: python_sim
     environment:

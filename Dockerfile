@@ -112,8 +112,8 @@ ENV PYTHONPATH="${WEBOTS_HOME}/lib/controller/python"
 
 # ── Repo-specific paths ──────────────────────────────────────
 # controller root → so `from source.EKFSlam import ...` resolves correctly
-# (source/ lives at controllers/my_first_controller0/source/)
-ENV PYTHONPATH="${PYTHONPATH}:/home/simuser/ekf_slam/Robotic_Systems/controllers/my_first_controller0"
+# (source/ lives at Robotic_Systems/controllers/source)
+ENV PYTHONPATH="${PYTHONPATH}:/home/simuser/ekf_slam/Robotic_Systems/controllers"
 
 # Webots resolves PROTO files relative to the project directory
 ENV WEBOTS_PROJECT_DIR=/home/simuser/ekf_slam/Robotic_Systems

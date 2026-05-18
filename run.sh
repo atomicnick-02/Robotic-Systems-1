@@ -28,7 +28,7 @@ case "${1:-help}" in
   # ---------- Build ----------
   build)
     echo ">>> Building ${IMAGE}..."
-    docker build -t "${IMAGE}" .
+    docker build --network=host -t "${IMAGE}" .
     ;;
 
   # ---------- GUI mode ----------

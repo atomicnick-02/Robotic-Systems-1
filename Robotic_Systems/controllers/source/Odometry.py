@@ -14,7 +14,7 @@ class Odometry:
 		"""
 		# Robot parameters
 		self.wheel_radius   = 0.043     # m
-		self.wheel_distance = 0.28     # m between wheels
+		self.wheel_distance = 0.220     # m between wheels
 		
 		# Time step (s)
 		self.dt = time_step_ms / 1000.0
@@ -81,61 +81,24 @@ class Odometry:
 		"""
 		return self.velocity.copy()
 
-	def get_wheel_velocities(self, left_encoder, right_encoder):
-		"""
-		Calculate the angular velocities of both wheels.
-		
-		Args:
-			left_encoder: Current left wheel encoder value
-			right_encoder: Current right wheel encoder value
-			
-		Returns:
-			Tuple of (left_angular_velocity, right_angular_velocity)
-		"""
-		if self.prev_enc is None:
-			self.prev_enc = np.array([left_encoder, right_encoder])
-			return 0.0, 0.0
-		encoder_diff = np.array([left_encoder, right_encoder]) - self.prev_enc
-		
-		# Calculate angular velocities
-		angular_velocities = encoder_diff / self.dt
-		
-		# Update previous encoder values
-		self.prev_enc = np.array([left_encoder, right_encoder])
-		
-		return tuple(angular_velocities)
+	def get_wheel_velocities(self):
+		"""Returns (ω_L, ω_R) in rad/s from the last update."""
+		# velocity already computed: v = (vR + vL)/2, w = (vR - vL)/L
+		# Solve back: vR = v + w*L/2, vL = v - w*L/2
+		v, w = self.velocity
+		vR = v + w * self.wheel_distance / 2.0
+		vL = v - w * self.wheel_distance / 2.0
+		omega_L = vL / self.wheel_radius
+		omega_R = vR / self.wheel_radius
+		return omega_L, omega_R
 	
 	def transform_aruco_to_world(self, aruco_dict):
-		"""
-		Transform Aruco marker positions from robot frame to world polar coordinates.
-
-		Args:
-			aruco_dict: Dictionary with Aruco IDs as keys and marker positions (list of np.array) as values
-
-		Returns:
-			List of [r, phi] tuples for detected markers
-		"""
-		theta = self.position[2]
-		x_r, y_r = self.position[0], self.position[1]
-
 		result_arr = []
-
 		for aruco_id, positions in aruco_dict.items():
 			for marker_pos in positions:
-				# Marker position in robot frame
 				x_m = float(marker_pos[0, 0])
 				y_m = float(marker_pos[1, 0])
-
-				# Convert to world coordinates
-				x_w = x_r + x_m * np.cos(theta) - y_m * np.sin(theta)
-				y_w = y_r + x_m * np.sin(theta) + y_m * np.cos(theta)
-
-				# Convert back to polar relative to robot pose
-				dx = x_w - x_r
-				dy = y_w - y_r
-				r = np.hypot(dx, dy)
-				phi = angle_normalize(np.arctan2(dy, dx) - theta)
-
+				r   = np.hypot(x_m, y_m)
+				phi = angle_normalize(np.arctan2(y_m, x_m))
 				result_arr.append([r, phi])
-
 		return result_arr

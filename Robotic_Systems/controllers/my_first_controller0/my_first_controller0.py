@@ -2,7 +2,7 @@ from controller import Robot
 from source.Odometry import Odometry
 import numpy as np
 from source.ApriltagDetector import AprilTagDetector
-from source.EKFSlam  import EKF_SLAM
+from source.EKFSlam import EKF_SLAM
 
 np.set_printoptions(suppress=True, precision=5)
 
@@ -98,8 +98,8 @@ while robot.step(TIME_STEP) != -1:
 	image = camera_rgb.getImage()
 
 	# Average encoder readings
-	left_enc  = rl_ps.getValue()
-	right_enc = rr_ps.getValue()
+	left_enc  = (fl_ps.getValue() + rl_ps.getValue()) / 2.0
+	right_enc = (fr_ps.getValue() + rr_ps.getValue()) / 2.0
 	enc_vals = [left_enc, right_enc]
 	# print(f"Encoders: {enc_vals[0]:.2f}, {enc_vals[1]:.2f}", end="  ")
 
@@ -137,7 +137,8 @@ while robot.step(TIME_STEP) != -1:
 		noisy_r_phi_dict.append(np.array([noisy_r, noisy_phi]))
 
 	# EKF-SLAM update using the freshly computed u
-	ekf_slam.update(u, noisy_r_phi_dict)
+	# ekf_slam.update(u, noisy_r_phi_dict)
+	ekf_slam.update(u, r_phi_dict)
 	robot_pose, landmarks = ekf_slam.get_state()
 
 	# Print pose comparisons
