@@ -7,7 +7,7 @@ class EKF_SLAM:
 	def __init__(self):
 		self.hypotheses = [self.Hypothesis(np.zeros(3), np.eye(3))]
 		self.R = np.diag([0.005, 0.005, np.deg2rad(0.2)]) ** 2
-		self.Q = np.diag([0.1, np.deg2rad(5)]) ** 2
+		Q = np.diag([0.3, np.deg2rad(15)]) ** 2
 		self.dt = 0.032
 		self.alpha_threshold = 9.21
 		self.min_landmark_distance = 0.6
@@ -156,6 +156,13 @@ class EKF_SLAM:
 		r, phi = z
 		lx = mu[0] + r * np.cos(phi + mu[2])
 		ly = mu[1] + r * np.sin(phi + mu[2])
+
+		# Hard reject: don't add if any existing landmark is nearby in world space
+		if len(mu) > 3:
+			lms = mu[3:].reshape(-1, 2)
+			dists = np.linalg.norm(lms - np.array([lx, ly]), axis=1)
+			if np.min(dists) < 1.5:  # physical tags are ~3-4m apart, so 1.5m is safe
+				return mu, Sigma
 		mu_new = np.append(mu, [lx, ly])
 		Sigma_new = np.zeros((len(mu_new), len(mu_new)))
 		Sigma_new[:len(Sigma), :len(Sigma)] = Sigma
