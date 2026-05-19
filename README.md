@@ -41,6 +41,36 @@ To run the high-fidelity simulation in Webots:
 3. Select `worlds/EKF_Slam.wbt` from the project directory.
 4. Press the **Play** button to start the simulation.
 
+### 3. Docker (Recommended)
+You can run the entire environment using Docker. This ensures all dependencies and Webots are correctly configured.
+
+#### Using the `run.sh` script
+The project includes a convenience script `run.sh` for common tasks:
+
+```bash
+# Build the image
+./run.sh build
+
+# Run the Python simulation
+./run.sh python
+
+# Run Webots with GUI (requires X11/Wayland support)
+./run.sh gui
+
+# Run Webots headless
+./run.sh headless
+
+# Drop into a bash shell inside the container
+./run.sh shell
+```
+
+#### Manual Docker Compose
+Alternatively, you can use Docker Compose directly:
+
+```bash
+docker compose -f docker/docker-compose.yml up
+```
+
 ## Project Structure
 
 - `python_sim.py`: Main entry point for the 2D Python simulation.

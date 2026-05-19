@@ -12,7 +12,7 @@ class EKF_SLAM:
 		self.alpha_threshold = 9.21
 		self.min_landmark_distance = 0.6
 		self.max_hypotheses = 5
-
+		
 	class Hypothesis:
 		def __init__(self, mu, Sigma, score=0.0):
 			self.mu = mu.copy()
@@ -61,20 +61,22 @@ class EKF_SLAM:
 
 	def correct(self, z):
 		new_hypotheses = []
+		# CORRECT — observations applied sequentially
 		for hyp in self.hypotheses:
+			current_mu, current_Sigma = hyp.mu.copy(), hyp.Sigma.copy()
+			current_score = hyp.score
 			for zi in z:
-				associations = self._associate(hyp.mu, hyp.Sigma, zi)
+				associations = self._associate(current_mu, current_Sigma, zi)
 				if not associations:
-					mu_new, Sigma_new = self._add_new_landmark(hyp.mu, hyp.Sigma, zi)
-					new_hypotheses.append(self.Hypothesis(mu_new, Sigma_new, hyp.score))
+					current_mu, current_Sigma = self._add_new_landmark(current_mu, current_Sigma, zi)
 				else:
-					for j, dz, H, K, maha in associations:
-						mu_new = hyp.mu + K @ dz
-						mu_new[2] = self.wrap_angle(mu_new[2])
-						Sigma_new = (np.eye(len(mu_new)) - K @ H) @ hyp.Sigma
-						score = hyp.score + (self.alpha_threshold - maha)  # Higher score for better matches
-						new_hypotheses.append(self.Hypothesis(mu_new, Sigma_new, score))
-
+					best = min(associations, key=lambda a: a[4])  # pick lowest Mahalanobis
+					j, dz, H, K, maha = best
+					current_mu = current_mu + K @ dz
+					current_mu[2] = self.wrap_angle(current_mu[2])
+					current_Sigma = (np.eye(len(current_mu)) - K @ H) @ current_Sigma
+					current_score += (self.alpha_threshold - maha)
+			new_hypotheses.append(self.Hypothesis(current_mu, current_Sigma, current_score))
 		self.hypotheses = sorted(new_hypotheses, key=lambda h: h.score, reverse=True)[:self.max_hypotheses]
 		best = self.hypotheses[0]
 		best.mu, best.Sigma = self._merge_close_landmarks(best.mu, best.Sigma, self.min_landmark_distance)
@@ -145,7 +147,9 @@ class EKF_SLAM:
 				K = Sigma @ H.T @ np.linalg.inv(S)
 				associations.append((j, dz, H, K, maha))
 
-		return associations
+		if associations:
+			return [min(associations, key=lambda a: a[4])]
+		return []
 
 
 	def _add_new_landmark(self, mu, Sigma, z):
@@ -155,7 +159,7 @@ class EKF_SLAM:
 		mu_new = np.append(mu, [lx, ly])
 		Sigma_new = np.zeros((len(mu_new), len(mu_new)))
 		Sigma_new[:len(Sigma), :len(Sigma)] = Sigma
-		Sigma_new[-2:, -2:] = np.diag([0.05, 0.05])
+		Sigma_new[-2:, -2:] = np.diag([0.5, 0.5])
 		return mu_new, Sigma_new
 
 
@@ -207,11 +211,17 @@ class EKF_SLAM:
 		new_Sigma = np.zeros((len(new_mu), len(new_mu)))
 		new_Sigma[:3, :3] = Sigma[:3, :3]
 
-		for i, old_idx in enumerate(keep_indices):
-			old_lm_idx = 3 + 2 * old_idx
-			new_lm_idx = 3 + 2 * i
-			new_Sigma[new_lm_idx:new_lm_idx + 2, new_lm_idx:new_lm_idx + 2] = \
-				Sigma[old_lm_idx:old_lm_idx + 2, old_lm_idx:old_lm_idx + 2]
+		for i, old_i in enumerate(keep_indices):
+			oi = 3 + 2 * old_i
+			ni = 3 + 2 * i
+			# pose <-> landmark
+			new_Sigma[:3, ni:ni+2] = Sigma[:3, oi:oi+2]
+			new_Sigma[ni:ni+2, :3] = Sigma[oi:oi+2, :3]
+			# landmark <-> landmark
+			for j, old_j in enumerate(keep_indices):
+				oj = 3 + 2 * old_j
+				nj = 3 + 2 * j
+				new_Sigma[ni:ni+2, nj:nj+2] = Sigma[oi:oi+2, oj:oj+2]
 
 		print(f"[Merge] {len(new_lms)} landmarks after merging\n{'-'*40}")
 		return new_mu, new_Sigma

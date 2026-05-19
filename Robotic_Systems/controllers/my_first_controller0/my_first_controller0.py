@@ -83,7 +83,7 @@ ekf_slam.set_noise_parameters(
 	R=np.diag([0.005, 0.005, np.deg2rad(0.2)]) ** 2,
 	Q=np.diag([0.1, np.deg2rad(5)]) ** 2
 )
-
+ekf_slam.set_time_step(TIME_STEP / 1000.0)
 # Initialize AprilTag Detector
 april_detector = AprilTagDetector(camera_rgb, robot)
 
